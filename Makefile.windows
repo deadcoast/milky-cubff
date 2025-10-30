@@ -1,0 +1,71 @@
+# Windows-specific Makefile for CuBFF
+# For use with MinGW/MSYS2 or when manually building on Windows
+
+CUDA := 0
+
+# Detect if we're using MinGW or Visual Studio
+ifdef COMSPEC
+    # We're on Windows - detect compiler
+    CXX ?= g++
+    ifneq ($(shell where cl 2>nul),)
+        # Visual Studio compiler detected
+        COMPILER := cl
+        FLAGS := /std:c++17 /O2 /EHsc /W3
+        LINK_FLAGS :=
+        EXE_EXT := .exe
+        OBJ_EXT := .obj
+    else
+        # Assume MinGW
+        COMPILER := g++
+        FLAGS := -g -std=c++17 -O3 -Wall
+        LINK_FLAGS := -lbrotlienc -lbrotlidec -fopenmp
+        EXE_EXT := .exe
+        OBJ_EXT := .o
+    endif
+else
+    COMPILER := ${CXX}
+    FLAGS := -g -std=c++17 -O3 -Wall
+    LINK_FLAGS := -lbrotlienc -lbrotlidec -fopenmp
+    EXE_EXT := .exe
+    OBJ_EXT := .o
+endif
+
+PYTHON := 0
+
+# Language object files
+LANGS=$(patsubst %.cu,build/%$(OBJ_EXT),$(wildcard *.cu))
+
+ifeq (${PYTHON}, 0)
+.PHONY: all
+all: bin/main$(EXE_EXT)
+else
+all: bin/main$(EXE_EXT) bin/cubff${PYEXT}
+endif
+
+# Main executable
+bin/main$(EXE_EXT): build/main$(OBJ_EXT) build/common$(OBJ_EXT) ${LANGS}
+	${COMPILER} $^ ${FLAGS} ${LINK_FLAGS} /Fe$@
+
+# Build C++ source files
+build/%$(OBJ_EXT): %.cc common.h common_language.h
+	${COMPILER} -c ${FLAGS} $< /Fo$@
+
+# Build CUDA source files (treated as regular C++ if CUDA=0)
+ifneq (${CUDA}, 0)
+build/%$(OBJ_EXT): %.cu common.h common_language.h forth.inc.h bff.inc.h
+	nvcc -c -arch sm_75 --compiler-options -Wall ${FLAGS} $< -o $@
+else
+build/%$(OBJ_EXT): %.cu common.h common_language.h forth.inc.h bff.inc.h
+	${COMPILER} -c ${FLAGS} -xc++ $< /Fo$@
+endif
+
+build/cubff_py$(OBJ_EXT): cubff_py.cc common.h
+	${COMPILER} -c ${FLAGS} $< /Fo$@ $(shell python3 -m pybind11 --includes 2>/dev/null || echo "")
+
+bin/cubff${PYEXT}: build/cubff_py$(OBJ_EXT) build/common$(OBJ_EXT) ${LANGS}
+	${COMPILER} -shared $^ ${FLAGS} ${LINK_FLAGS} /Fe$@
+
+.PHONY: clean
+clean:
+	del /Q bin\main.exe bin\cubff* build\*.obj build\*.o 2>nul || rm -rf bin/main.exe bin/cubff* build/*.obj build/*.o
+
