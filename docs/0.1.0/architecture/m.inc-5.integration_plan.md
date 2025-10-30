@@ -103,9 +103,70 @@ To implement the BFF experiment or adapt it for your own simulation, you can fol
 
 2. Prepare the Execution Function: Implement a function (or class) that simulates the execution of a combined 128-byte tape. This function will take two 64-byte programs (A and B), concatenate them into a 128-byte tape, initialize the pointers, and step through instructions. You might also include an argument for the maximum number of instructions to execute (e.g. 8192)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=Parenthesis%20matching%20follows%20the%20usual,Note%203). Pseudo-code for the execution loop could look like this:
 
-    `def execute_bff(tape, max_steps=8192):     pc = 0       # instruction pointer     head0 = 0    # primary head (start at 0)     head1 = 64   # secondary head (start at 64, other half)     steps = 0     # Use a stack or precomputed map for matching brackets:     bracket_stack = []     matching_bracket = compute_matching_brackets(tape)  # optional pre-processing for loops     while steps < max_steps:         instr = tape[pc]         if instr == ord('>'):        # move head0 right             head0 += 1         elif instr == ord('<'):      # move head0 left             head0 -= 1         elif instr == ord('}'):      # move head1 right             head1 += 1         elif instr == ord('{'):      # move head1 left             head1 -= 1         elif instr == ord('+'):      # increment value at head0             tape[head0] = (tape[head0] + 1) % 256         elif instr == ord('-'):      # decrement value at head0             tape[head0] = (tape[head0] - 1) % 256         elif instr == ord('.'):      # copy value from head0 to head1             tape[head1] = tape[head0]         elif instr == ord(','):      # copy value from head1 to head0             tape[head0] = tape[head1]         elif instr == ord('['):      # loop start             if tape[head0] == 0:                 # jump to the instruction after the matching ']' pc = matching_bracket[pc]         elif instr == ord(']'):      # loop end             if tape[head0] != 0:                 # jump back to the instruction after the matching '['                 pc = matching_bracket[pc]         # For any other byte value, do nothing (no-op)          # Increment program counter         pc += 1         steps += 1         # Check termination conditions         if pc < 0 or pc >= len(tape):             break  # PC went out of bounds         if head0 < 0 or head0 >= len(tape) or head1 < 0 or head1 >= len(tape):             break  # a head went out of bounds     # End of execution loop     return tape  # tape now contains the modified program bytes`
+    ```python
+        def execute_bff(tape, max_steps=8192):
+            pc = 0 
+            # instruction pointer
+            head0 = 0    # primary head (start at 0)
+            head1 = 64   # secondary head (start at 64, other half)
+            steps = 0     # Use a stack or precomputed map for matching brackets:
+            bracket_stack = []
+            matching_bracket = compute_matching_brackets(tape)  # optional pre-processing for loops
+            while steps < max_steps:
+                instr = tape[pc]
+                if instr == ord('>'):        # move head0 right
+                    head0 += 1
+                elif instr == ord('<'):      # move head0 left
+                    head0 -= 1
+                elif instr == ord('}'):      # move head1 right
+                    head1 += 1
+                elif instr == ord('{'):      # move head1 left
+                    head1 -= 1
+                elif instr == ord('+'):      # increment value at head0
+                    tape[head0] = (tape[head0] + 1) % 256
+                elif instr == ord('-'):      # decrement value at head0
+                    tape[head0] = (tape[head0] - 1) % 256
+                elif instr == ord('.'):      # copy value from head0 to head1
+                    tape[head1] = tape[head0]
+                elif instr == ord(','):      # copy value from head1 to head0
+                    tape[head0] = tape[head1]
+                elif instr == ord('['):      # loop start
+                    if tape[head0] == 0:
+                        # jump to the instruction after the matching ']'
+                        pc = matching_bracket[pc]
+                    elif instr == ord(']'):      # loop end
+                        if tape[head0] != 0:
+                            # jump back to the instruction after the matching '['
+                            pc = matching_bracket[pc]
+                    # For any other byte value, do nothing (no-op)
+                    # Increment program counter
+                    pc += 1
+                    steps += 1
+                    # Check termination conditions
+                    if pc < 0 or pc >= len(tape):
+                        break  # PC went out of bounds
+                    if head0 < 0 or head0 >= len(tape) or head1 < 0 or head1 >= len(tape):
+                        break  # a head went out of bounds
+                    # End of execution loop
+                    return tape  # tape now contains the modified program bytes
+    ```
 
-    The above pseudo-code demonstrates the handling of each instruction as defined by the BFF semantics[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command). It also shows checks for out-of-bounds and uses a helper `matching_bracket` mapping for efficient loop jumps (this can be computed by scanning the tape for `[` and `]` pairs before execution). Note that any byte not recognized in the `if/elif` chain is effectively a no-op and just falls through to the pointer increment. After the loop, the function returns the modified `tape` (or you could choose to return the two 64-byte halves separately).
+    The above pseudo-code demonstrates the handling of each instruction as defined by the BFF semantics[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command). It also shows checks for out-of-bounds and uses a helper `matching_bracket` mapping for efficient loop jumps (this can be computed by scanning the tape for `[` and `]` pairs before execution). Note that any byte not recognized in the `if/elif` chain is effectively a no-op and just falls through to the pointer increment. After the loop, the function returns the modified `tape` (or you could choose to return the two 64-byte halves separately). Here is an example of how to compute the `matching_bracket` mapping using Python code:
+
+    ```python
+    def compute_matching_brackets(tape):
+        matching_bracket = [-1] * len(tape)
+        bracket_stack = []
+        for i, instr in enumerate(tape):
+            if instr == ord('['):
+                bracket_stack.append(i)
+            elif instr == ord(']'):
+                if bracket_stack:
+                    matching_bracket[bracket_stack.pop()] = i
+                else:
+                    matching_bracket[i] = -1
+        return matching_bracket
+    ```
 
 3. Execute Pair Interactions: Using the above execution function, implement the pairing logic. For each epoch (or iteration):
 

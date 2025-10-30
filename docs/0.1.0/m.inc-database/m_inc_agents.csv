@@ -1,0 +1,7 @@
+id,role,currency,compute,copy,defend,raid,trade,sense,adapt,employer,retainer_fee,bribe_policy_mode,bribe_threshold
+K-01,king,5400,14,16,22,3,18,7,9,,,threshold,350
+K-02,king,7200,10,12,18,2,22,6,8,,,threshold,400
+N-07,knight,210,5,3,17,2,0,9,6,K-01,25,,
+N-11,knight,160,4,2,14,1,0,8,5,K-02,20,,
+M-12,mercenary,40,2,4,1,11,0,5,4,,,,
+M-19,mercenary,15,1,3,0,8,0,4,3,,,,

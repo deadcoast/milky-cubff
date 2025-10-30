@@ -3,19 +3,19 @@
 ## Meta-Implementations (GoL running GoL)
 
 [Life in Life in Life](https://github.com/mrphlip/life3) - mrphlip/life3
-
+- [Directory](variation_repos/life3)
 - <https://github.com/mrphlip/life3>
 - Generates nested GoL using OTCA Metapixels, creates videos of Life simulating Life
 - Lua scripts for Golly + C++ rendering code
 
 [Lisp in Life](https://github.com/woodrush/lisp-in-life) - woodrush/lisp-in-life
-
+- [Directory](variation_repos/lisp-in-life)
 - <https://github.com/woodrush/lisp-in-life>
 - Full Lisp interpreter running in GoL via the QFT computer
 - Includes compiler from C → QFTASM → VarLife → GoL
 
 [QFT Development Kit](https://github.com/woodrush/QFT-devkit) - woodrush/QFT-devkit
-
+- [Directory](variation_repos/QFT-devkit)
 - <https://github.com/woodrush/QFT-devkit>
 - Tools for working with Quest for Tetris computer architecture
 - Python scripts for ROM/RAM preparation, metafier for VarLife → GoL conversion
@@ -23,22 +23,22 @@
 ## Quest for Tetris (The Big One)
 
 [Main Repository](https://github.com/QuestForTetris/QFT) - QuestForTetris/QFT
-
+- [Directory](variation_repos/QFT)
 - <https://github.com/QuestForTetris/QFT>
 - Original Tetris-in-GoL project with all construction tools
 
 [Tetris Writeup](https://github.com/QuestForTetris/tetris-writeup) - QuestForTetris/tetris-writeup
-
+- [Directory](variation_repos/tetris-writeup)
 - <https://github.com/QuestForTetris/tetris-writeup>
 - Complete documentation of the architecture, including VarLife explanation
 
 [COGOL](https://github.com/QuestForTetris/Cogol) - QuestForTetris/Cogol
-
+- [Directory](variation_repos/Cogol)
 - <https://github.com/QuestForTetris/Cogol>
 - Higher-level language ("C of Game of Life") that compiles to QFTASM
 
 [GCC Backend](https://github.com/QuestForTetris/qftasm-gcc) - QuestForTetris/qftasm-gcc
-
+- [Directory](variation_repos/qftasm-gcc)
 - <https://github.com/QuestForTetris/qftasm-gcc>
 - Modified GCC that targets the QFTASM architecture
 
@@ -50,6 +50,7 @@ Online Interpreter:
 ## HashLife Implementations
 
 [Python](https://github.com/johnhw/hashlife) - johnhw/hashlife
+- [Directory](variation_repos/hashlife)
 - Clean Python implementation with detailed explanation
 - Companion article: [Hashlife Repository Index](https://johnhw.github.io/hashlife/index.md.html)
 
@@ -64,14 +65,14 @@ Online Interpreter:
 ## Golly (The Standard Simulator)
 
 Official Source - AlephAlpha/golly or jimblandy/golly
-
+- [Directory](variation_repos/golly)
 - <https://github.com/AlephAlpha/golly>
 - C++ with wxWidgets GUI
 - Includes HashLife, QuickLife algorithms, scriptable via Python/Lua
 - Sourceforge: <http://golly.sourceforge.net/>
 
 GollyGang Organization - <https://github.com/GollyGang>
-
+- [Directory](variation_repos/GollyGang)
 - Rule table repository and supplemental patterns
 
 ## SmoothLife (Continuous GoL)
@@ -87,7 +88,7 @@ Original (engibeer) - engibeer/smooth-life
 - Mirror of sourceforge project with 2D/3D graphics
 
 Python+NumPy (duckythescientist) - duckythescientist/SmoothLife
-
+- [Directory](variation_repos/SmoothLife)
 - <https://github.com/duckythescientist/SmoothLife>
 - Math-light explanation with visualization
 
@@ -104,7 +105,7 @@ JavaScript (Xalava) - Xalava/WireWorld
 - Browser-based circuit designer
 
 Python (yackx) - yackx/wireworld
-
+- [Directory](variation_repos/wireworld)
 - <https://github.com/yackx/wireworld>
 - Simple implementation with GUI, includes circuit samples (XOR gates, etc.)
 

@@ -331,9 +331,9 @@
                 <div class="button-container">
                     <button class="control-button" id="step-first">⏮ First</button>
                     <button class="control-button" id="step-back-10">⏪ -10</button>
-                    <button class="control-button" id="step-back">◀ Prev</button>
-                    <button class="control-button primary" id="step-play">▶ Play</button>
-                    <button class="control-button" id="step-next">Next ▶</button>
+                    <button class="control-button" id="step-back"> Prev</button>
+                    <button class="control-button primary" id="step-play"> Play</button>
+                    <button class="control-button" id="step-next">Next </button>
                     <button class="control-button" id="step-forward-10">+10 ⏩</button>
                     <button class="control-button" id="step-last">Last ⏭</button>
                 </div>
@@ -734,7 +734,7 @@
                 playButton.innerHTML = '⏸ Pause';
                 playTimer = setInterval(playStep, 1000 / (playbackSpeed * 2));
             } else {
-                playButton.innerHTML = '▶ Play';
+                playButton.innerHTML = ' Play';
                 if (playTimer) {
                     clearInterval(playTimer);
                     playTimer = null;
@@ -813,7 +813,7 @@
             } else {
                 // End of trace, stop playback
                 isPlaying = false;
-                playButton.innerHTML = '▶ Play';
+                playButton.innerHTML = ' Play';
                 clearInterval(playTimer);
                 playTimer = null;
             }
