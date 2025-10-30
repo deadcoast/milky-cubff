@@ -149,7 +149,7 @@ Here's the complete end-to-end workflow in one block for easy copy-paste:
 wsl
 
 # 2. Navigate to project
-cd /mnt/c/Users/ryanf/github/assets/cubff
+cd /mnt/c/Users/ryanf/github/assets/milky-cubff
 
 # 3. Install system dependencies (first time only)
 sudo apt update
