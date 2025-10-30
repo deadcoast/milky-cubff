@@ -10,14 +10,14 @@
 * Instrumentation (entropy, compressibility, opcode histograms)
 * Snapshot/restore, replicator assay, exact replication event detection, schedulers
 
-> How to use: Create a folder `bffx/` and save each file below to it (filenames shown). Then run `python -m bffx.cli --help`.
+> How to use: Create a folder `minc/` and save each file below to it (filenames shown). Then run `python -m minc.cli --help`.
 
 ---
 
-## `bffx/vm.py`
+## `minc/vm.py`
 
 ```python
-# bffx/vm.py
+# minc/vm.py
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -197,10 +197,10 @@ class BFFVM:
 
 ---
 
-## `bffx/scheduler.py`
+## `minc/scheduler.py`
 
 ```python
-# bffx/scheduler.py
+# minc/scheduler.py
 from __future__ import annotations
 import random
 from typing import List, Tuple
@@ -218,10 +218,10 @@ def random_disjoint_pairs(n: int, rng: random.Random) -> List[Tuple[int, int]]:
 
 ---
 
-## `bffx/analytics.py`
+## `minc/analytics.py`
 
 ```python
-# bffx/analytics.py
+# minc/analytics.py
 from __future__ import annotations
 import math
 import zlib
@@ -264,10 +264,10 @@ def hamming(a: bytes, b: bytes) -> int:
 
 ---
 
-## `bffx/detectors.py`
+## `minc/detectors.py`
 
 ```python
-# bffx/detectors.py
+# minc/detectors.py
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
@@ -305,10 +305,10 @@ def detect_exact_replication(A_before: bytes, B_before: bytes,
 
 ---
 
-## `bffx/snapshot.py`
+## `minc/snapshot.py`
 
 ```python
-# bffx/snapshot.py
+# minc/snapshot.py
 from __future__ import annotations
 import gzip
 import json
@@ -335,10 +335,10 @@ def load_population_json_gz(path: str) -> tuple[list[bytearray], dict]:
 
 ---
 
-## `bffx/soup.py`
+## `minc/soup.py`
 
 ```python
-# bffx/soup.py
+# minc/soup.py
 from __future__ import annotations
 import random
 from dataclasses import dataclass
@@ -437,10 +437,10 @@ class Soup:
 
 ---
 
-## `bffx/assay.py`
+## `minc/assay.py`
 
 ```python
-# bffx/assay.py
+# minc/assay.py
 from __future__ import annotations
 import random
 from typing import List, Tuple
@@ -488,10 +488,10 @@ def assay_candidate(candidate: bytes,
 
 ---
 
-## `bffx/cli.py`
+## `minc/cli.py`
 
 ```python
-# bffx/cli.py
+# minc/cli.py
 from __future__ import annotations
 import argparse
 import random
@@ -568,8 +568,8 @@ if __name__ == "__main__":
 ## Quick start
 
 ```bash
-# from the parent folder that contains bffx/
-python -m bffx.cli --pop 1024 --epochs 2000 --report-every 100 --seed 123 --mutate 0.00005
+# from the parent folder that contains minc/
+python -m minc.cli --pop 1024 --epochs 2000 --report-every 100 --seed 123 --mutate 0.00005
 ```
 
 ## Extend later (safe hooks provided)
