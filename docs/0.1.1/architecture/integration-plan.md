@@ -1,0 +1,322 @@
+---
+title: "M|inc Integration Plan"
+description: "Adapting ideas from variation_repos to strengthen M|inc incentives (0.1.1)"
+version: "0.1.1"
+last_updated: "2025-10-30"
+dependencies:
+  - "../../0.1.0/architecture/m.inc-2.variations.md"
+  - "../../OVERVIEW.md"
+  - "m.inc-incentives.md"
+---
+
+# Integration Plan
+
+## Sources Consulted (local repos)
+
+- HashLife (`docs/0.1.0/variation_repos/hashlife/`)
+- Wireworld (`docs/0.1.0/variation_repos/wireworld/`)
+- SmoothLife (`docs/0.1.0/variation_repos/SmoothLife/`)
+- Golly (`docs/0.1.0/variation_repos/golly/`)
+- QFT/Tetris suite (`QFT`, `tetris-writeup`, `Cogol`, `qftasm-gcc`)
+- Lisp-in-Life (`lisp-in-life/`)
+- Life3 (`life3/`)
+
+## Mappings → Concrete M|inc Additions
+
+### HashLife → Canonicalization + Memoized Encounters
+- Canonical role/state encoding for agent sets to maximize cache hits.
+- Deterministic state hash to memoize bribe/raid/defend outcomes across repeats.
+
+### Wireworld → Event Signaling with Refractory Periods
+- Channels: raid, defend, bribe, trade with priorities.
+- Refractory windows prevent immediate re-trigger loops.
+
+### SmoothLife → Soft Projections and Decisions
+- Smooth exposure factors and defense projections via kernels.
+- Sigmoid/softmax gates for probabilistic but deterministic decisions.
+
+### QFT/Tetris → Pipeline Discipline
+- Pure function stages with replayable intermediates.
+- Versioned config embedded in outputs for reproducibility.
+
+### Lisp-in-Life → Policy Mini-DSL
+- YAML-driven expressions compiled into pure Python callables.
+- Hot-swap policies without changing engine code.
+
+### Life3 → Hierarchical Time
+- Macro tick aggregates micro-events, reducing IO and improving throughput.
+
+## Deliverables in 0.1.1
+
+- Adapter spec and module contracts (see API docs).
+- Extended JSON/CSV schemas for cache and hierarchical ticks.
+- Safeguards: determinism, cache validity, refractory semantics.
+
+## Evolution Plan
+
+- Preserve current Python BFF framework behavior
+- Add incentive-centric economics as an external layer (adapters + logs)
+- Provide reproducible metrics and schemas
+
+## Features (Additive)
+
+1) Incentive Adapter Layer
+    - Standalone Python module (non-invasive) that consumes per-tick snapshots
+    - Computes: raid_value, p_knight_win, bribe outcomes, currency↔wealth conversions
+    - Emits: JSON state, CSV events per OVERVIEW
+
+2) Agent Registry and Roles
+    - Map tapes/IDs to roles: king, knight, mercenary (configurable ratios)
+    - Allow role mutation at low rate (optional flag)
+
+3) Currency Ledger
+    - Per-agent currency balances, mirrored losses, stakes, bounties
+    - Deterministic updates per event
+
+4) Trait Accrual Rules
+    - Trade: -100 currency → +3 defend, +2 trade (king-only)
+    - Emergent bonuses from tape activity: thresholds configurable
+
+5) Exposure and Projection Functions
+    - exposure_factor(king)=1.0; parameterize for experiments
+    - king_defend_projection from active knights
+
+6) Metrics and Telemetry
+    - Entropy, compression_ratio, copy_score_mean
+    - Totals: wealth_total, currency_total
+    - Distribution snapshots and Gini-like measures (optional)
+
+## Optimizations
+
+- Selection pressure schedules: ramp up/down mutation or pairing bias by entropy bands
+- Event batching: aggregate micro-events per tick to reduce IO
+- Caching sigmoid/clamp computations for hot paths
+- Parallel evaluation across agents (multiprocessing-friendly)
+
+## Integration Points (No Breaks)
+
+- Read-only consumption of existing soup traces (`save_bff_trace.py` compatible)
+- New scripts live under `python/` as separate modules; no changes to `bff_interpreter.py`
+- Optional CLI: `run_single_bff_program.py` pipes to adapter for demo outputs
+
+## File Outputs (Schemas)
+
+- JSON per-tick: `docs/0.1.1/api/m.inc-json-schemas.md`
+- CSV event log: `docs/0.1.1/api/m.inc-json-schemas.md`
+
+## Configuration
+
+- YAML config for ratios (roles), thresholds (bribes, traits), exposure, schedules
+- Seed control for reproducible runs
+
+## Future Work
+
+- Learning policies (beyond fixed formulas) with bandit/heuristics
+- Visualization overlay for `bff-visualizer.html`
+- Interop with variations (GoL/QFT) as external data sources
+
+## Memory Architecture: Unified 128-Byte Tape
+
+In Blaise Agüera y Arcas’ BFF experiment, each program is a sequence of 64 bytes. To simulate interactions, two 64-byte programs are concatenated end-to-end to form a unified 128-byte tape[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=with%20A%20and%20B%20as,divides%20the%20result%20back%20into). This single tape serves as both _code and data memory_ – there is no separate data area. In other words, the program’s own bytes reside in the same memory that it can read and write. Initially, a large “primordial soup” of many such 64-byte programs i
+s created with random byte values (uniformly distributed)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20main%20kind%20of%20simulations,another%20by%20selecting%20random%20ordered). Each byte can range 0–255; however, only certain byte values correspond to actual instructions (detailed below), and all other values act as inert data or no-ops[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=that%20since%20instructions%20and%20data,to%20execute%20code%20and%20overwrite). By combining two programs A and B into one 128-byte array, we designate (for bookkeeping) the first 64 bytes as A’s region and the next 64 as B’s region. All instructions and data share this tape, enabling self-modifying code (the program can overwrite its own instructions or those of its neighbor)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=exit%20loops,a%20family%20of%20extended%20BF).
+
+Tape Initialization: When two programs are paired, their bytes are copied into a 128-byte tape buffer (positions 0–63 for program A, and 64–127 for program B). It’s sensible to initialize the machine’s two data heads (explained below) so that each points to the start of one program’s region (e.g. `head0 = 0` at A’s start, and `head1 = 64` at B’s start). This way, each head initially “knows” which 64-byte segment it is over. (The researchers note that the choice of initial head positions is important – if both heads started at the same location, trivial self-copying behaviors can dominate[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=We%20confirmed%20that%20BFF%20variants,com%2Fwatch%3Fv%3D07NoZwvgJ_M%2011).) The instruction pointer (PC) always begins at position 0 for execution[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows), meaning it will start reading instructions from the first byte of the combined tape (the start of program A’s code). All memory cells (the tape bytes) are addressable by these pointers, and out-of-bounds accesses are disallowed. The simulation will terminate a run if a pointer would move outside the 0–127 range[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=In%20both%20variants%2C%20the%20program,replicators).
+
+## Tape Pairing, Concatenation, and Execution Strategy
+
+The system operates in iterative cycles (epochs) over the soup of programs. In each epoch, the simulator performs random pairwise interactions among programs. The procedure is:
+
+1. Select Two Programs: Randomly pick an ordered pair of distinct programs from the population. (Order matters because combining A+B is considered different from B+A[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=We%20can%20interpret%20the%20interaction,3).) Often, to ensure each program participates fairly, pairs are chosen such that each program is involved in at most one interaction per epoch. In practice this can be done by shuffling the program list and pairing neighbors, or by random pair selection with a marking strategy so no program is reused in the same epoch[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=constrain%20programs%20to%20only%20be,taken%20in%20this%20epoch%20yet).
+
+2. Concatenate into a 128-Byte Tape: Copy the 64 bytes of program A followed by the 64 bytes of program B into a contiguous 128-byte tape (as described above). This forms the executable combined program “AB”. The memory is now the union of both programs’ code. Importantly, since this memory is self-contained, any writes will modify the bytes of A, B, or both within this tape[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=executing%20the%20resulting%20code%20for,as%20an%20irreversible%20chemical%20reaction)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=languages%20read%20and%20write%20on,A%20and%20B%20as%20follows).
+
+3. Initialize Pointers: Set the instruction pointer `PC = 0` (to begin execution at the tape’s start)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows). Set the data pointers `head0` and `head1` to their initial positions (for example, `head0 = 0` and `head1 = 64` as a reasonable default aligning with each program’s starting offset). All three pointers operate on the same 128-byte tape space[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows). The tape’s content at this point is the bytes of A and B (no separate data initialization is needed beyond the program bytes, though any unused cells could be considered zero).
+
+4. Execute the Combined Program: Now, run the BFF interpreter on this 128-byte tape. The interpreter will sequentially fetch and execute instructions starting at `PC = 0`. Execution continues until one of the termination conditions is met:
+
+    - A fixed instruction step limit is reached (to prevent unbounded run time). In the original experiments, they imposed a cap of 2^13 = 8192 instructions per interaction[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=Parenthesis%20matching%20follows%20the%20usual,Note%203).
+
+    - A program termination instruction occurs (though in BFF there is no explicit “halt” instruction; termination is instead typically caused by running out of instructions or hitting a stop condition).
+
+    - A loop instruction has no matching bracket (if the interpreter encounters a `[` or `]` without its pair, it will terminate the program)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=Parenthesis%20matching%20follows%20the%20usual,Note%203).
+
+    - A pointer goes out of bounds (if `PC`, `head0`, or `head1` would move outside the 0–127 tape range, the execution is stopped to avoid invalid memory access)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=In%20both%20variants%2C%20the%20program,replicators).
+
+    During execution, each instruction may alter the tape or the pointers, as defined by the BFF language (see next section). Because code = data, many instructions will effectively modify the program’s own bytes. For example, an instruction that increments a tape cell will change the byte that might be an instruction in a later position, and a copy instruction can overwrite partner code. All such self-modifications happen in-place on the 128-byte tape. The process is deterministic given the initial tape; no external input is used (randomness only enters in which programs get paired). If an error or stop condition arises, the execution of this paired program halts.
+
+5. Split the Tape Back: After execution, we take the resulting 128-byte tape (which has likely been altered by the program’s self-modifying actions) and split it back into two 64-byte segments[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=with%20A%20and%20B%20as,4). The first 64 bytes become the new version of program A (`A'`), and the next 64 bytes become the new version of program B (`B'`). These updated programs overwrite the originals in the population[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=languages%20read%20and%20write%20on,A%20and%20B%20as%20follows). (In other words, the “chemistry” interaction `A + B -> A' + B'` has occurred.) Both offspring programs now reside in the soup and can participate in future epochs.
+
+6. Repeat for Many Epochs: The above pairing and execution steps are repeated, with new random pairings each epoch. Over time (hundreds or thousands of epochs, encompassing millions or billions of instruction executions), programs in the soup evolve. Most interactions do nothing interesting (effectively random code mucking up random data), but occasionally a special program arises that can self-replicate – it uses the other program’s space as scratch to copy itself. When such a self-replicator appears, it tends to spread: it produces copies of itself in other tapes, which then produce more copies, leading to a drop in entropy of the soup as many tapes become identical or highly structured[startuphub.ai](https://www.startuphub.ai/ai-news/ai-video/2025/life-as-code-unpacking-intelligence-evolution-and-purpose-with-blaise-aguera-y-arcas/#:~:text=emerge%20from%20randomness%20through%20computational,context%2C%20is%20simply%20to%20reproduce)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=sufficient%20to%20generate%20self,the%20catalyst%20b%20is%20undefined). For the purpose of implementing the framework, however, the main loop simply continues indefinitely or for a fixed number of epochs, applying random interactions and updates to the population.
+
+The above strategy essentially treats the pair interactions as a form of artificial chemical reaction. We can think of each pair execution as `exec(AB)` producing outcome `A'B'`. In fact, the process was modeled as: _A + B → split(exec(AB)) = A′ + B′_[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=with%20A%20and%20B%20as,4) (and similarly with order swapped for _B + A_). A self-replicator in this context is a program S that, when paired with some other “food” program F, produces two copies of S (i.e. `S + F → 2·S`)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=sufficient%20to%20generate%20self,the%20catalyst%20b%20is%20undefined). The emergence of such replicators is the key dynamic observed in the BFF experiment.
+
+## Pointer Model: Instruction Pointer and Two Heads
+
+BFF uses three pointers to track positions in the 128-byte tape during execution[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows):
+
+- Instruction Pointer (PC): This is analogous to a program counter. It indicates the address of the next instruction to execute on the tape. It starts at 0 for each combined tape run[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows). After each instruction, the PC advances to the next byte _unless_ altered by a jump instruction (the loop commands `[` and `]` can cause PC to jump). The PC runs through the unified 128-byte address space and does not reset or skip over the boundary between the original two programs – it sees one continuous tape of length 128. If the PC ever moves beyond the end of the tape (past index 127) or before the beginning (index < 0, which can only happen via a jump), the execution terminates due to out-of-bounds access[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=In%20both%20variants%2C%20the%20program,replicators). In practice, well-formed programs should not do that, but random ones often will unless prevented.
+
+- Head0 (Primary tape head): This pointer is analogous to Brainfuck’s data pointer, but here it operates on the same tape as the code. `head0` is used by many instructions as the source or target of data operations. For example, `+` and `-` increment or decrement the byte at `head0`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command). Loops (`[` `]`) also check the byte at `head0` to decide whether to loop[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=.%20tape,command). Typically, we initialize `head0 = 0` at the start (pointing to the first byte of the tape) unless otherwise specified. During execution, commands can move `head0` left or right along the tape (`<` or `>` instructions). If `head0` is moved beyond the tape bounds, that causes termination (so the implementation should check and stop if `head0 < 0` or `head0 > 127`).
+
+- Head1 (Secondary tape head): This is the second data pointer, introduced by BFF’s extension to facilitate self-copying. `head1` is moved by the `{` (move left) and `}` (move right) instructions[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command). We can think of `head0` and `head1` as two independent pointers that the program can manipulate. The copy instructions use both: `.` copies the byte at `head0` into the cell at `head1`, and `,` copies the byte at `head1` into the cell at `head0`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1). By default in the two-program tape, `head1` is typically initialized to point at the start of the second program (index 64) so that the two heads start out over different halves of the tape. This makes it straightforward for a program running from the first half to use `head1` to access the second half, and vice versa. (If `head1` were also at 0 initially, a program would have to explicitly move it 64 steps to reach the other region, which is possible but would require a long series of `{` or `}` instructions. Starting `head1` at 64 is a practical choice to simplify cross-region operations.) As with `head0`, moving `head1` out of bounds (<0 or >127) will terminate the execution.
+
+All three pointers work on the same unified memory. The crucial effect of this design is that there is no distinction between “instructions” and “data” in memory – any byte can be executed as an instruction by the PC, or modified as data via the heads. Initially, the bytes correspond to program code, but as the program runs, it can rewrite parts of the tape (including parts of itself or its partner). This self-referential memory architecture is what enables programs to self-modify and replicate. As noted in the BFF paper, _the instruction pointer, head0, and head1 all operate on the same tape_, which is initialized as a 128-byte array (with the program bytes loaded)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows).
+
+No-Op Handling: Since only a small subset of byte values correspond to valid instructions (10 values in total), every other byte value is treated as a no-operation (no-op) when read by the instruction pointer[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows). This means if the PC points to a byte that isn’t one of the defined commands, the interpreter will essentially do nothing for that step except move `PC` to the next byte. In the random soup, the majority of bytes are initially no-ops (nonsense instructions), which effectively get skipped over during execution. This creates a lot of “neutral” genome that can evolve without immediate effect, and also means programs can carry data (non-instruction values) around on their tape without causing accidental operations as long as the PC doesn’t jump into those data bytes.
+
+## BFF Instruction Set: 10 Operations and Semantics
+
+The BFF language is an extended Brainfuck-like language with 10 single-byte instructions. These were designed to allow minimal self-replication capability by making code and data share the same space and replacing input/output with copy operations[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=where%20the%20data%20and%20instruction,operation.%20The%20complete). In memory, instructions are identified by specific byte values (the experiments used character-like representations for human readability). For reference, the ten BFF operations are[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command):
+
+- `>` – Move `head0` one cell to the right (increment the head0 pointer by 1)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,head1%20%3D%20head1%20%2B%201).
+
+- `<` – Move `head0` one cell to the left (decrement the head0 pointer by 1)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,head1%20%3D%20head1%20%2B%201).
+
+- `}` – Move `head1` one cell to the right (increment the head1 pointer by 1)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,head1%20%3D%20head1%20%2B%201).
+
+- `{` – Move `head1` one cell to the left (decrement the head1 pointer by 1)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,head1%20%3D%20head1%20%2B%201).
+
+- `+` – Increment the byte at `head0` by 1 (wrap around if needed, since bytes are 0–255)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1).
+
+- `-` – Decrement the byte at `head0` by 1 (underflow wraps around)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1).
+
+- `.` – Copy the byte at `head0` to the cell at `head1`. In C-like pseudocode: `tape[head1] = tape[head0]`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1). This is a write operation from head0’s position to head1’s position.
+
+- `,` – Copy the byte at `head1` to the cell at `head0`: `tape[head0] = tape[head1]`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1). This is essentially the inverse copy, reading from head1’s position.
+
+- `[` – Start of a loop. Jump forward to the matching `]` if the byte at `head0` is zero[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=.%20tape,command). (If the value at the current cell is 0, the loop is skipped; otherwise, if non-zero, execution continues into the loop body.) Brackets can be nested, and they must match in a balanced way. This forms the only flow-control structure in BFF (like Brainfuck’s loops).
+
+- `]` – End of a loop. Jump backward to the matching `[` if the byte at `head0` is non-zero[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=.%20tape,command). (If the value at head0 is not 0, it goes back to the start of the loop, creating a loop iteration. If the value is 0, the loop terminates and execution proceeds forward past the `]`.)
+
+These loop semantics mean the byte at `head0` acts as the loop’s condition variable: typically a loop will continue until that cell becomes 0. Important: If the interpreter encounters a `[` with no corresponding `]` (or vice versa), it will stop execution, as this is considered a malformed program[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=Parenthesis%20matching%20follows%20the%20usual,Note%203). The implementation should include a matching-bracket finder or use a stack to handle nested loops properly.
+
+Non-instruction bytes: Any byte value not corresponding to the above 10 commands does nothing when executed (no-op)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,instruction%20set%20is%20as%20follows). For example, if the byte `0x41` (`'A'`) appears in the tape and the PC executes it, nothing happens (except PC moves on). This allows arbitrary data to reside in the tape. The BFF design also designates one specific byte value to represent a “true zero” for data purposes (in practice this is just the 0 value). This is relevant because loops check for zero. Random bytes could be anything 0–255; when we say a cell is zero, we mean its numeric value is 0x00. The experiments effectively treat 0x00 as the distinguished zero for loop checks[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=that%20since%20instructions%20and%20data,to%20execute%20code%20and%20overwrite).
+
+With these operations, BFF is Turing-complete (like Brainfuck), albeit operating on a very small memory (128 bytes per combined program run). The addition of a second head and the copy instructions (`.` and `,`) is what enables self-replication, as we’ll see next. Notably, there are no input or output instructions – the `.` and `,` commands took the place of BF’s I/O to keep everything self-contained on the tape[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=where%20the%20data%20and%20instruction,operation.%20The%20complete). Thus, a BFF program cannot rely on any external stream; its only way to “affect the world” is by writing to its own tape (or its partner’s tape space) and eventually that can influence the population when the tape splits.
+
+## Self-Modification and Replication Mechanism
+
+A core feature of BFF is that programs can modify themselves and each other during execution. Because the code is stored in the tape, any instruction that writes to the tape (such as `+`, `-`, `.`, `,`) is potentially altering the program’s _code_. This blurs the line between code and data, allowing for self-modifying code. For example, a program might execute `+` on a cell that initially contains a no-op value, turning it into a valid instruction value (or vice versa)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=that%20since%20instructions%20and%20data,to%20execute%20code%20and%20overwrite). Or it might use the `.` instruction to copy a series of bytes from one part of the tape to another, effectively duplicating a sequence of instructions. These capabilities set the stage for autocatalytic behavior – where a program’s execution causes the creation of new programs similar to itself.
+
+Replication via Copying: The key to self-replication in this system is the copy loop. A self-replicating program (call it S) will treat the other program’s memory space as a buffer to write a copy of itself into[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=sufficient%20to%20generate%20self,the%20catalyst%20b%20is%20undefined). Concretely, S will use `head0` to read its own bytes and `head1` to write into the other half of the tape (or vice versa). The typical structure is: move both heads to the start of each half (for instance, head0 at the start of S’s code, head1 at the start of the other region), then perform a loop that copies byte by byte. For example, a replication loop in BFF pseudocode might look like:
+
+`[ . > } ]`
+
+This snippet (if embedded in a larger program) means: “While the byte at `head0` is not zero (`[`...`]` loop), copy that byte to `head1` (`.`), then advance `head0` to the next byte (`>`), and advance `head1` to the next byte (`}`)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,command)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=.%20tape,command).” In effect, this loop will iterate through a sequence of cells, duplicating them from the source region to the target region, until it encounters a byte value `0` which signals the end of the sequence and breaks the loop. By using a zero-terminated sequence of bytes, the replicator knows when it has copied its entire code. After such a loop, the other half of the tape would contain a duplicate of S (assuming S had placed a 0 after its code as a terminator). S might then reset pointers or perform any final tweaks and then halt, leaving two copies of S on the tape. Upon splitting the tape, both A' and B' would now equal S, meaning S has successfully replicated[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=S%20%2B%20F%20a%20%E2%88%92%E2%86%92,replicate%20at%20random).
+
+It’s worth noting that the emergent self-replicators found in the experiments are not hand-written but evolved from random code. They often utilize creative tricks with the limited instruction set. For instance, some observed replicators copy themselves with an offset or use multiple loops to replicate non-contiguous parts of their code[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=limitations,but%20this%20is%20generally%20computationally). But at heart, they all rely on the ability to copy bytes from one location to another. The `.` and `,` instructions provide the only mechanism for cross-memory copying, so they are heavily used by replicators. Indeed, once the soup transitions into the “living” state, a few dominant instruction patterns (especially the copy operations) become much more common in the population[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=3.3%20Real,on%20artificially%20designed%20minimalistic%20languages).
+
+Self-Overwrite and Neighbor-Overwrite: Self-modification isn’t only for replication. A program can also overwrite parts of _itself_ during its execution. For example, a program might contain code that, when executed, writes new values into its earlier instruction slots (perhaps changing a loop or setting up a termination condition). This can be a strategy to adapt or to encode data within the code space. However, in practice the most interesting case is overwriting the neighbor’s space (the other 64 bytes on the tape) because that’s what leads to replication. The paper describes that when a self-replicator runs, it repurposes the other program’s code space as “available real estate” for making a copy of itself[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=S%20%2B%20F%20a%20%E2%88%92%E2%86%92,replicate%20at%20random). The other program effectively becomes _substrate_ or “food” – it gets overwritten and turned into another instance of the replicator. This is why once a true self-replicator appears, it can start to take over the soup: each time it interacts with any other program, it writes a copy of itself onto that program. In subsequent epochs those copies do the same, leading to exponential growth of that sequence (until limited by the fixed population size)[startuphub.ai](https://www.startuphub.ai/ai-news/ai-video/2025/life-as-code-unpacking-intelligence-evolution-and-purpose-with-blaise-aguera-y-arcas/#:~:text=emerge%20from%20randomness%20through%20computational,context%2C%20is%20simply%20to%20reproduce).
+
+No External Input/Output: Since BFF programs have no I/O, the only observable outcome of their execution is the new bytes on the tape. Thus the “goal” (if any) of a program can only be to restructure the bytes – essentially, to produce patterns that persist. Self-replication is the clearest such pattern: the program’s bytes arrange to produce a copy of themselves. The experiment did not impose any explicit fitness function or selection criteria for replication[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=exit%20loops,a%20family%20of%20extended%20BF). The emergence of self-replicating sequences was spontaneous, driven purely by the dynamics of random code interacting and occasionally producing a replicating pattern. Therefore, in designing the integration, we do not hard-code any replication behavior – we simply allow all instructions (including self-modification) and the replicators will (with some luck and many trials) emerge on their own. That said, for testing purposes, one could introduce a known self-replicating program into the soup to verify that the framework works (the paper describes a hand-written replicator of length 21 bytes was used to “seed” some experiments[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=9%2016%2020%204%204,that%20if%20we%20seeded%20the), which quickly took over, demonstrating the viability of the environment).
+
+## Implementation Steps and Example Code
+
+To implement the BFF experiment or adapt it for your own simulation, you can follow a structured approach:
+
+1. Define the Program Representation: Represent each program as an array of 64 bytes. These could be Python bytearrays, C arrays, etc. Initialize a pool of N programs (for example, N=1000 for testing, up to N=131072 for larger experiments) with random bytes 0–255 in each[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20main%20kind%20of%20simulations,another%20by%20selecting%20random%20ordered). Ensure the random distribution is uniform across 0–255 for true randomness. (Keep in mind that only ~10/256 of those values will act as actual instructions – so most bytes are no-ops initially.)
+
+2. Prepare the Execution Function: Implement a function (or class) that simulates the execution of a combined 128-byte tape. This function will take two 64-byte programs (A and B), concatenate them into a 128-byte tape, initialize the pointers, and step through instructions. You might also include an argument for the maximum number of instructions to execute (e.g. 8192)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=Parenthesis%20matching%20follows%20the%20usual,Note%203). Pseudo-code for the execution loop could look like this:
+
+    ```python
+        def execute_bff(tape, max_steps=8192):
+            pc = 0 
+            # instruction pointer
+            head0 = 0    # primary head (start at 0)
+            head1 = 64   # secondary head (start at 64, other half)
+            steps = 0     # Use a stack or precomputed map for matching brackets:
+            bracket_stack = []
+            matching_bracket = compute_matching_brackets(tape)  # optional pre-processing for loops
+            while steps < max_steps:
+                instr = tape[pc]
+                if instr == ord('>'):        # move head0 right
+                    head0 += 1
+                elif instr == ord('<'):      # move head0 left
+                    head0 -= 1
+                elif instr == ord('}'):      # move head1 right
+                    head1 += 1
+                elif instr == ord('{'):      # move head1 left
+                    head1 -= 1
+                elif instr == ord('+'):      # increment value at head0
+                    tape[head0] = (tape[head0] + 1) % 256
+                elif instr == ord('-'):      # decrement value at head0
+                    tape[head0] = (tape[head0] - 1) % 256
+                elif instr == ord('.'):      # copy value from head0 to head1
+                    tape[head1] = tape[head0]
+                elif instr == ord(','):      # copy value from head1 to head0
+                    tape[head0] = tape[head1]
+                elif instr == ord('['):      # loop start
+                    if tape[head0] == 0:
+                        # jump to the instruction after the matching ']'
+                        pc = matching_bracket[pc]
+                    elif instr == ord(']'):      # loop end
+                        if tape[head0] != 0:
+                            # jump back to the instruction after the matching '['
+                            pc = matching_bracket[pc]
+                    # For any other byte value, do nothing (no-op)
+                    # Increment program counter
+                    pc += 1
+                    steps += 1
+                    # Check termination conditions
+                    if pc < 0 or pc >= len(tape):
+                        break  # PC went out of bounds
+                    if head0 < 0 or head0 >= len(tape) or head1 < 0 or head1 >= len(tape):
+                        break  # a head went out of bounds
+                    # End of execution loop
+                    return tape  # tape now contains the modified program bytes
+    ```
+
+    The above pseudo-code demonstrates the handling of each instruction as defined by the BFF semantics[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%3C%20head0%20%3D%20head0%20,command). It also shows checks for out-of-bounds and uses a helper `matching_bracket` mapping for efficient loop jumps (this can be computed by scanning the tape for `[` and `]` pairs before execution). Note that any byte not recognized in the `if/elif` chain is effectively a no-op and just falls through to the pointer increment. After the loop, the function returns the modified `tape` (or you could choose to return the two 64-byte halves separately). Here is an example of how to compute the `matching_bracket` mapping using Python code:
+
+    ```python
+    def compute_matching_brackets(tape):
+        matching_bracket = [-1] * len(tape)
+        bracket_stack = []
+        for i, instr in enumerate(tape):
+            if instr == ord('['):
+                bracket_stack.append(i)
+            elif instr == ord(']'):
+                if bracket_stack:
+                    matching_bracket[bracket_stack.pop()] = i
+                else:
+                    matching_bracket[i] = -1
+        return matching_bracket
+    ```
+
+3. Execute Pair Interactions: Using the above execution function, implement the pairing logic. For each epoch (or iteration):
+
+    - Select random pairs of programs from your pool. For example, you could shuffle the list of indices and then take them in pairs `(i, j)`. Another approach is pick a random `i` and a random `j` ≠ `i` for each interaction (this may allow repeats in one epoch unless you guard against it). The exact selection scheme can be tweaked, but the simplest is to ensure disjoint pairs per epoch for fairness[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=constrain%20programs%20to%20only%20be,taken%20in%20this%20epoch%20yet).
+
+    - For each pair `(i, j)` (with program `A = pool[i]`, `B = pool[j]`), create a copy of their bytes in a 128-byte array `tape = A + B`. Then call `execute_bff(tape)`. This will run the simulation of A and B combined.
+
+    - Upon return, take the first 64 bytes of `tape` as `A'` and the next 64 bytes as `B'`. Replace the original `pool[i]` with `A'` and `pool[j]` with `B'`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=languages%20read%20and%20write%20on,A%20and%20B%20as%20follows). Now the pool has been updated with the “offspring” of A and B.
+
+    - You can introduce a small probability of random mutation in the bytes after splitting (e.g. flip a bit or randomize a byte with low probability) to simulate background radiation if desired – the original experiments sometimes included a tiny mutation rate (like 0.024% per byte per step)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,long%20tape%20to%20the%20PC)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=gas%2C%20a%20large%20number%20of,steps%20or%20until%20the%20program). However, they found that even zero mutation runs can produce self-replicators[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=%E2%80%B2%E2%80%B2%20%2B%20B%E2%80%B2%E2%80%B2%20,as%20follows%3A%20S%20%2B%20F), so mutation is optional.
+
+4. Monitoring and Termination: As the simulation runs for many epochs, you may want to monitor certain metrics – for example, the diversity of programs or an entropy measure – to detect if a self-replication event has occurred[startuphub.ai](https://www.startuphub.ai/ai-news/ai-video/2025/life-as-code-unpacking-intelligence-evolution-and-purpose-with-blaise-aguera-y-arcas/#:~:text=emerge%20from%20randomness%20through%20computational,context%2C%20is%20simply%20to%20reproduce). In the original experiment, they tracked a complexity metric (“high-order entropy”) which drops when the soup is taken over by replicators[startuphub.ai](https://www.startuphub.ai/ai-news/ai-video/2025/life-as-code-unpacking-intelligence-evolution-and-purpose-with-blaise-aguera-y-arcas/#:~:text=emerge%20from%20randomness%20through%20computational,context%2C%20is%20simply%20to%20reproduce). For a simple replication test, you could just run, say, 100k pairings and then check if many programs in the pool are identical (a sign that one program replicated widely). In terms of termination, you can run indefinitely or stop after a certain number of epochs/instructions. A successful outcome is that one sequence manages to copy itself into many others. If implementing from scratch, it’s wise to start with a smaller tape size or simpler language to verify everything works, then scale up to the full 64-byte BFF.
+
+The above steps outline a minimal working simulation. Here’s a quick example of using the execution function on a contrived small case:
+
+Suppose we craft a simple program A that will copy its first byte into every position of B. For instance, program A could be: `["+.]` (which in BFF means: increment the value at head0, then copy it to head1). And let program B initially be all zeros (64 bytes of 0, which are no-ops). When we run `exec(A+B)`:
+
+- `head0` starts at A’s start (0) and `head1` at B’s start (64).
+
+- PC=0: Instruction `'+'` (0x2B) increments `tape[head0]`. Initially `tape[0]` was (say) 0; now it becomes 1[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1).
+
+- PC=1: Instruction `'.'` copies `tape[head0]` to `tape[head1]`[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,head1). This copies the value 1 from position 0 to position 64.
+
+- PC=2: There is no more instruction (let’s assume A was only 2 bytes long and rest are no-ops). PC now reads a no-op in A’s remaining space or in B’s space; nothing happens until we hit the execution step limit or we decide to stop early since we know A was done.
+
+- After splitting, program A' will have `tape[0]` = 1 (and the rest unchanged), and program B' will have `tape[0]` (its first byte) = 1, because of the copy. This isn’t a full replicator, but it shows self-modification (A changed itself by writing a 1 to its code cell 0) and cross-tape write (A wrote into B’s first cell). A true replicator would copy many bytes in a loop, but the mechanism is the same as this simple demo.
+
+## Performance and Parallelization (GPU vs CPU)
+
+The CuBFF open-source implementation provides both CPU and GPU support for running these simulations[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20code%20for%20the%20experiments,lang%20bff_noheads). If performance is a concern (and it typically is, since billions of instruction executions might be needed to see complex self-replicators), leveraging parallelism is essential. The core simulation loop described above can be parallelized in a straightforward way: because each pair interaction is independent (they operate on different tapes/programs), you can run multiple pair executions concurrently on separate threads or GPU cores. The CuBFF code, for example, can compile with CUDA to run many interactions in parallel on the GPU, or fall back to a multi-threaded CPU execution if CUDA is disabled[github.com](https://github.com/paradigms-of-intelligence/cubff#:~:text=This%20project%20provides%20a%20,were%20done%20using%20this%20code)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20code%20for%20the%20experiments,lang%20bff_noheads). In the reported experiments, the team achieved on the order of 3×10^9 instructions per second across all threads on a high-end machine[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=to%20a%20new%20valid%20instruction,achieve%20around%203%20%C2%B7%20109) – this parallel speed was necessary to simulate ~180 billion instructions in about a minute, during which a “good” replicator typically emerged in their setup[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=to%20a%20new%20valid%20instruction,achieve%20around%203%20%C2%B7%20109).
+
+As a developer reproducing this framework, if you have access to a GPU, you can compile the simulation to use it (for instance, CuBFF’s `Makefile` uses `CUDA=1` by default, and `make CUDA=0` for CPU-only[github.com](https://github.com/paradigms-of-intelligence/cubff#:~:text=Run%20instructions)). Both modes produce identical behavior, so you can develop and test on CPU and then scale up on GPU for speed[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20code%20for%20the%20experiments,lang%20bff_noheads). The repository also provides Python bindings (`cubff.py`) to easily experiment with the simulation from a scripting environment[github.com](https://github.com/paradigms-of-intelligence/cubff#:~:text=%60bin%2Fmain%20). This could be useful for writing analysis code to detect when a replicator appears or to automate seeding experiments.
+
+Note on Determinism: The simulation should be mostly deterministic given a random seed (the only source of randomness is in how pairs are chosen and any explicit mutations). If using parallel threads, ensure that each interaction’s result is applied correctly before the next epoch (the simplest strategy is to divide the pool into pairs and have each thread handle one pair, then synchronize). In CuBFF, they handle this carefully so that results match whether run on GPU or CPU[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20code%20for%20the%20experiments,lang%20bff_noheads).
+
+By following this integration plan – setting up the unified memory, implementing the BFF instruction set semantics, and iterating random pair interactions – a developer can replicate the BFF experiment framework. All the critical pieces (two-head memory model, self-modifying instructions, and the random interaction loop) come directly from the verified design in Agüera y Arcas et al.’s work, as documented in the paper and realized in CuBFF. With this in place, one can observe how complexity in the “soup” evolves and hopefully witness the spontaneous emergence of self-replicating programs from a sea of randomness[startuphub.ai](https://www.startuphub.ai/ai-news/ai-video/2025/life-as-code-unpacking-intelligence-evolution-and-purpose-with-blaise-aguera-y-arcas/#:~:text=emerge%20from%20randomness%20through%20computational,context%2C%20is%20simply%20to%20reproduce)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=sufficient%20to%20generate%20self,the%20catalyst%20b%20is%20undefined). Each of the above steps is grounded in the actual experimental setup, avoiding any added assumptions, so you can be confident that reproducing these details will yield a system consistent with the original BFF experiment.
+
+Sources: The description and pseudocode above are based on the technical specification of BFF from _“Computational Life: How Well-formed, Self-replicating Programs Emerge from Simple Interaction”_[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=instruction%20pointer%2C%20the%20read%20and,1)[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=,command) and the CuBFF implementation notes[arxiv.org](https://arxiv.org/pdf/2406.19108#:~:text=The%20code%20for%20the%20experiments,lang%20bff_noheads), ensuring that the integration plan reflects the actual behavior observed in Blaise Agüera y Arcas’ experiment.

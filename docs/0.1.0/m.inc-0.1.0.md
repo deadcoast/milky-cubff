@@ -7,11 +7,11 @@ This document outlines a comprehensive documentation architecture for the CuBFF 
 ## Current State Analysis
 
 ### Source Code Structure
-- **Core Implementation**: C++/CUDA with Python bindings
-- **Build Systems**: Makefile, CMakeLists.txt, PowerShell build script
-- **Python Components**: Pure Python BFF interpreter, analysis tools, visualization
-- **Cross-Platform**: Windows (native + WSL2), macOS, Linux support
-- **Language Variants**: BFF, Forth, SUBLEQ, Z80 emulation
+- Core Implementation: C++/CUDA with Python bindings
+- Build Systems: Makefile, CMakeLists.txt, PowerShell build script
+- Python Components: Pure Python BFF interpreter, analysis tools, visualization
+- Cross-Platform: Windows (native + WSL2), macOS, Linux support
+- Language Variants: BFF, Forth, SUBLEQ, Z80 emulation
 
 ### Existing Documentation Gaps
 - Inconsistent cross-referencing between source and docs

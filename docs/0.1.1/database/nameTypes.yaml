@@ -1,0 +1,79 @@
+---
+title: "M|inc nameTypes"
+description: "Name types for M|inc"
+version: "0.1.0"
+last_updated: "2025-10-30"
+dependencies:
+  - "../README.md"
+document:
+  comment: "nameTypes-0.1.0"
+  sections:
+    - title: "M|inc nameTypes"
+      types:
+        nameTypes: []
+    - title: "SourceCode nameTypes"
+    - title: "GitHub nameTypes"
+      types:
+        PrefixUsage:
+          - "Prefixing branch names based on their purpose helps categorize and identify them quickly. Here are some common prefixes:"
+          - "feature/: For new features or functionalities."
+          - "bugfix/: For fixing bugs in the code."
+          - "hotfix/: For urgent patches, usually applied to production."
+          - "design/: For user interface or user experience updates."
+          - "refactor/: For improving code structure without changing functionality."
+          - "test/: For writing or improving automated tests."
+          - "doc/: For documentation updates."
+      names:
+        PrefixExamples:
+          - "feature/add-user-profile"
+          - "bugfix/correct-date-display"
+          - "design/improve-dashboard-ui"
+          - "refactor/optimize-database-queries"
+          - "test/add-unit-tests"
+          - "doc/add-api-instructions"
+          - "doc/update-contributor-guidelines"
+      types_additional:
+        ExamplesWithVariable:
+          - "feature/{feature-name}"
+          - "bugfix/{bug-name}"
+          - "hotfix/{hotfix-name}"
+          - "design/{design-name}"
+          - "refactor/{refactor-name}"
+          - "test/{test-name}"
+          - "doc/{doc-name}"
+    - title: "Incorporate Ticket Numbers or Identifiers"
+      types:
+        TicketNumbers:
+          - "Include ticket numbers or issue IDs in the branch name. This links the branch to its corresponding task, making it easier to track progress."
+    - title: "nameType schema"
+      types:
+        nameType:
+          - name: "(string|number|date|boolean|object|array|function|symbol|undefined|null|void|any)"
+            description: "string"
+            examples:
+              As_nameType:
+                - "feature/feature-{nameType}-{description}"
+                - "bugfix/bugfix-{nameType}-{description}"
+                - "hotfix/hotfix-{nameType}-{description}"
+                - "design/design-{nameType}-{description}"
+                - "refactor/refactor-{nameType}-{description}"
+                - "test/test-{nameType}-{description}"
+                - "doc/doc-{nameType}-{description}"
+              examples:
+                - { name: "string",     description: "string" }
+                - { name: "number",     description: "string" }
+                - { name: "date",       description: "string" }
+                - { name: "boolean",    description: "string" }
+                - { name: "object",     description: "string" }
+                - { name: "array",      description: "string" }
+                - { name: "function",   description: "string" }
+                - { name: "symbol",     description: "string" }
+                - { name: "undefined",  description: "string" }
+                - { name: "null",       description: "string" }
+                - { name: "void",       description: "string" }
+    - title: "Collaborate on a Branch Naming Strategy"
+      types:
+        Collaborate:
+          - "These are examples of how to name branches."
+          - "It is crucial to standardize a naming strategy for all github data to ensure consistency and ease of use."
+...

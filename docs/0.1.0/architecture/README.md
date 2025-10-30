@@ -19,7 +19,7 @@ cross_references:
   - ../tools/README.md
 ---
 
-# CuBFF Architecture Overview
+# CuBFF Architecture Overview - (DEPRECIATED:"0.1.0") ==> (MIGRATED:"0.1.1")
 
 The CuBFF architecture implements a self-modifying computational environment where programs can evolve and self-replicate through random interactions. This document provides a comprehensive overview of the system architecture and design principles.
 
