@@ -2,19 +2,19 @@
 
 ## Quick Decision Guide
 
-**Which method should I use?**
+Which method should I use?
 
-1. **Use WSL2** if you want the easiest setup (works like Linux)
-2. **Use CMake** if you want a native Windows build with modern tools
-3. **Use Makefile** if you're comfortable with traditional Unix tools
+1. Use WSL2 if you want the easiest setup (works like Linux)
+2. Use CMake if you want a native Windows build with modern tools
+3. Use Makefile if you're comfortable with traditional Unix tools
 
 ## Detailed Comparison
 
 ### WSL2 Method
-- **Pros**: Easiest, no code changes needed, uses original Makefile
-- **Cons**: Requires WSL2 installation, runs in Linux environment
-- **Best for**: Getting started quickly, Linux-like development
-- **Commands**:
+- Pros: Easiest, no code changes needed, uses original Makefile
+- Cons: Requires WSL2 installation, runs in Linux environment
+- Best for: Getting started quickly, Linux-like development
+- Commands:
   ```bash
   wsl
   sudo apt install build-essential libbrotli-dev
@@ -22,10 +22,10 @@
   ```
 
 ### CMake Method (Native Windows)
-- **Pros**: Cross-platform, modern, integrates with Visual Studio
-- **Cons**: Requires CMake and vcpkg setup
-- **Best for**: Long-term development, team projects
-- **Commands**:
+- Pros: Cross-platform, modern, integrates with Visual Studio
+- Cons: Requires CMake and vcpkg setup
+- Best for: Long-term development, team projects
+- Commands:
   ```bash
   mkdir build && cd build
   cmake .. -DUSE_CUDA=OFF
@@ -33,22 +33,22 @@
   ```
 
 ### Makefile Method (Native Windows)
-- **Pros**: Simple, similar to original workflow
-- **Cons**: Requires pkg-config or manual library paths
-- **Best for**: Quick builds if you have MinGW/MSYS2
-- **Commands**:
+- Pros: Simple, similar to original workflow
+- Cons: Requires pkg-config or manual library paths
+- Best for: Quick builds if you have MinGW/MSYS2
+- Commands:
   ```bash
   make -f Makefile.windows CUDA=0
   ```
 
 ## Required Dependencies
 
-### All Methods Need:
+### All Methods Need
 - C++17 compiler (GCC 8+, Clang 6+, MSVC 2017+)
 - Brotli compression library
 - OpenMP (for parallel processing)
 
-### CUDA (Optional):
+### CUDA (Optional)
 - NVIDIA GPU with CUDA support
 - CUDA Toolkit 10.0+
 - Use `CUDA=0` to disable if not available
@@ -81,4 +81,3 @@ Or on Windows:
 ```
 
 You should see simulation output with metrics and program visualization.
-

@@ -106,13 +106,13 @@ Alternative method using the provided `Makefile.windows`:
 
 ## Troubleshooting
 
-### If `pkg-config` is not found:
+### If `pkg-config` is not found
 The Makefile uses `pkg-config` which isn't standard on Windows. Use the WSL2 option or compile manually with the flags.
 
-### If CUDA path cannot be found:
+### If CUDA path cannot be found
 Use `CUDA=0` to build without CUDA support.
 
-### If OpenMP errors occur:
+### If OpenMP errors occur
 Some Windows builds may need to disable OpenMP or link to specific OpenMP libraries depending on your compiler.
 
 ## Quick Start (WSL2 recommended)
