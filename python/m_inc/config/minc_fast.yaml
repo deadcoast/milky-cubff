@@ -1,0 +1,71 @@
+# M|inc Fast Configuration
+# Optimized for quick experiments and testing
+# Version: 0.1.1
+
+version: "0.1.1"
+seed: 42
+
+# Simplified role ratios
+roles:
+  ratios:
+    king: 0.15        # More kings for more interactions
+    knight: 0.25      # More knights for more defends
+    mercenary: 0.60   # Fewer mercenaries
+  mutation_rate: 0.0
+
+# Economic parameters (same as default)
+economic:
+  currency_to_wealth_ratio: [100, 5]
+  bribe_leakage: 0.05
+  exposure_factors:
+    king: 1.0
+    knight: 0.5
+    mercenary: 0.4
+  raid_value_weights:
+    alpha_raid: 1.0
+    beta_sense_adapt: 0.25
+    gamma_king_defend: 0.60
+    delta_king_exposed: 0.40
+  defend_resolution:
+    base_knight_winrate: 0.50
+    trait_advantage_weight: 0.30
+    clamp_min: 0.05
+    clamp_max: 0.95
+    stake_currency_frac: 0.10
+  trade:
+    invest_per_tick: 100
+    created_wealth_units: 5
+    distribution:
+      defend: 3
+      trade: 2
+  on_failed_bribe:
+    king_currency_loss_frac: 0.50
+    king_wealth_loss_frac: 0.25
+
+# Reduced refractory periods for faster action
+refractory:
+  raid: 1
+  defend: 0
+  bribe: 0
+  trade: 0
+
+# Cache disabled for simplicity
+cache:
+  enabled: false
+  max_size: 1000
+  witness_sample_rate: 0.0
+
+# Minimal output (JSON only)
+output:
+  json_ticks: true
+  csv_events: false
+  csv_final_agents: true
+  compress: false
+
+# Trait emergence enabled
+trait_emergence:
+  enabled: true
+  rules:
+    - condition: "copy >= 12 AND tick % 2 == 0"
+      delta:
+        copy: 1

@@ -1,0 +1,84 @@
+# M|inc Default Configuration
+# Version: 0.1.1
+
+version: "0.1.1"
+seed: 1337
+
+# Role assignment and initialization
+roles:
+  ratios:
+    king: 0.10        # 10% of agents are kings
+    knight: 0.20      # 20% of agents are knights
+    mercenary: 0.70   # 70% of agents are mercenaries
+  mutation_rate: 0.0  # Probability of role mutation per tick (0 = disabled)
+
+# Economic parameters
+economic:
+  # Currency to wealth conversion
+  currency_to_wealth_ratio: [100, 5]  # 100 currency = 5 wealth units
+  
+  # Bribe leakage (successful bribes only)
+  bribe_leakage: 0.05  # 5% wealth leakage on successful bribe
+  
+  # Exposure factors (for raid value calculation)
+  exposure_factors:
+    king: 1.0
+    knight: 0.5
+    mercenary: 0.4
+  
+  # Raid value weights
+  raid_value_weights:
+    alpha_raid: 1.0           # Weight for merc.raid
+    beta_sense_adapt: 0.25    # Weight for merc.(sense+adapt)
+    gamma_king_defend: 0.60   # Weight for king's defense projection
+    delta_king_exposed: 0.40  # Weight for king's exposed wealth
+  
+  # Defend resolution parameters
+  defend_resolution:
+    base_knight_winrate: 0.50         # Base probability of knight winning
+    trait_advantage_weight: 0.30      # Sigmoid input multiplier for trait delta
+    employment_bonus: 0.08            # Bonus for employed knights (+8% win chance)
+    clamp_min: 0.05                   # Minimum win probability
+    clamp_max: 0.95                   # Maximum win probability
+    stake_currency_frac: 0.10         # Stake as fraction of combined currency
+  
+  # Trade parameters (kings only)
+  trade:
+    invest_per_tick: 100              # Currency investment per trade
+    created_wealth_units: 5           # Total wealth units created
+    distribution:
+      defend: 3                       # Wealth units to defend trait
+      trade: 2                        # Wealth units to trade trait
+  
+  # Failed bribe / raid success losses
+  on_failed_bribe:
+    king_currency_loss_frac: 0.50     # King loses 50% currency
+    king_wealth_loss_frac: 0.25       # King loses 25% wealth per trait
+
+# Refractory periods (in ticks)
+refractory:
+  raid: 2      # Cooldown after raid attempt
+  defend: 1    # Cooldown after defend
+  bribe: 1     # Cooldown after bribe
+  trade: 0     # No cooldown for trade
+
+# Cache configuration
+cache:
+  enabled: true                # Enable caching of deterministic outcomes
+  max_size: 10000             # Maximum cache entries
+  witness_sample_rate: 0.05   # Sample 5% of cache writes for validation
+
+# Output configuration
+output:
+  json_ticks: true            # Write per-tick JSON snapshots
+  csv_events: true            # Write CSV event log
+  csv_final_agents: true      # Write final agent state CSV
+  compress: false             # Compress JSON output (gzip)
+
+# Trait emergence rules
+trait_emergence:
+  enabled: true
+  rules:
+    - condition: "copy >= 12 AND tick % 2 == 0"
+      delta:
+        copy: 1

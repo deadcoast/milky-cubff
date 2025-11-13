@@ -1,0 +1,7179 @@
+[
+  {
+    "tick": 1,
+    "metrics": {
+      "entropy": 6.188,
+      "compression_ratio": 2.55,
+      "copy_score_mean": 0.229,
+      "wealth_total": 1505,
+      "currency_total": 33721,
+      "bribes_paid": 35,
+      "bribes_accepted": 35,
+      "raids_attempted": 0,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 0
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 4547,
+        "wealth": {
+          "compute": 8,
+          "copy": 9,
+          "defend": 13,
+          "raid": 0,
+          "trade": 10,
+          "sense": 0,
+          "adapt": 1
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 2569,
+        "wealth": {
+          "compute": 3,
+          "copy": 7,
+          "defend": 15,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 393,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 409,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 453,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 354,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 280,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 382,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 490,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 407,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 476,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 374,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 395,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 527,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 393,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 153,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 268,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 160,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 3096,
+        "wealth": {
+          "compute": 4,
+          "copy": 6,
+          "defend": 15,
+          "raid": 0,
+          "trade": 10,
+          "sense": 1,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 351,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 487,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 3719,
+        "wealth": {
+          "compute": 4,
+          "copy": 5,
+          "defend": 14,
+          "raid": 0,
+          "trade": 14,
+          "sense": 2,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 361,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 319,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 506,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 379,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 220,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 234,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 330,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 396,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 470,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 2978,
+        "wealth": {
+          "compute": 6,
+          "copy": 6,
+          "defend": 17,
+          "raid": 0,
+          "trade": 15,
+          "sense": 0,
+          "adapt": 1
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 483,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 362,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 207,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 360,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 173,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 364,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 491,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 479,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 404,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 370,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 344,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 232,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 485,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 470,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 375,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 383,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 342,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 521,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ],
+    "meta": {
+      "version": "0.1.1",
+      "seed": 1337,
+      "config_hash": "84f3f8ec05fe5358",
+      "timestamp": "2025-11-13T17:47:13.762367Z",
+      "generator": "m_inc"
+    }
+  },
+  {
+    "tick": 2,
+    "metrics": {
+      "entropy": 6.176,
+      "compression_ratio": 2.6,
+      "copy_score_mean": 0.202,
+      "wealth_total": 1411,
+      "currency_total": 33221,
+      "bribes_paid": 35,
+      "bribes_accepted": 27,
+      "raids_attempted": 8,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 8
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 2449,
+        "wealth": {
+          "compute": 2,
+          "copy": 3,
+          "defend": 10,
+          "raid": 0,
+          "trade": 6,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 271,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 12,
+          "raid": 0,
+          "trade": 9,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 830,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 771,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 779,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 712,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 305,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 819,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 972,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 769,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 802,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 732,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 832,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 1009,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 719,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 177,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 288,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 182,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 1019,
+        "wealth": {
+          "compute": 0,
+          "copy": 2,
+          "defend": 14,
+          "raid": 0,
+          "trade": 8,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 788,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 845,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 1761,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 12,
+          "raid": 0,
+          "trade": 11,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 723,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 1207,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 832,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 861,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 245,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 257,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 767,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 754,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 832,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 205,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 14,
+          "raid": 0,
+          "trade": 11,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 809,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 799,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 232,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 718,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 195,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 846,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 853,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 805,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 762,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 299,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 268,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 257,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 387,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 364,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 268,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 265,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 216,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 364,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 3,
+    "metrics": {
+      "entropy": 6.164,
+      "compression_ratio": 2.65,
+      "copy_score_mean": 0.202,
+      "wealth_total": 1436,
+      "currency_total": 68848,
+      "bribes_paid": 35,
+      "bribes_accepted": 0,
+      "raids_attempted": 35,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 35
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 2307,
+        "wealth": {
+          "compute": 2,
+          "copy": 3,
+          "defend": 13,
+          "raid": 0,
+          "trade": 8,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 121,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 15,
+          "raid": 0,
+          "trade": 11,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 624,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 550,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 535,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 451,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 330,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 521,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 629,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 412,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 406,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 303,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 350,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 461,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 145,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 201,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 308,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 204,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 870,
+        "wealth": {
+          "compute": 0,
+          "copy": 2,
+          "defend": 17,
+          "raid": 0,
+          "trade": 10,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 150,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 138,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 1613,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 15,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55859,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 270,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 280,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 54,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 257,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 217,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 4,
+    "metrics": {
+      "entropy": 6.152,
+      "compression_ratio": 2.7,
+      "copy_score_mean": 0.201,
+      "wealth_total": 1451,
+      "currency_total": 79216,
+      "bribes_paid": 35,
+      "bribes_accepted": 2,
+      "raids_attempted": 33,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 33
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 2165,
+        "wealth": {
+          "compute": 2,
+          "copy": 3,
+          "defend": 16,
+          "raid": 0,
+          "trade": 10,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 1106,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 912,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 456,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 373,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 355,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 428,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 516,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 309,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 294,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 190,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 221,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 308,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 8,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 225,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 328,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 226,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 239,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 19,
+          "raid": 0,
+          "trade": 11,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 1103,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 14,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 295,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 303,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 5,
+    "metrics": {
+      "entropy": 6.14,
+      "compression_ratio": 2.75,
+      "copy_score_mean": 0.2,
+      "wealth_total": 1462,
+      "currency_total": 90812,
+      "bribes_paid": 35,
+      "bribes_accepted": 1,
+      "raids_attempted": 34,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 34
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 1697,
+        "wealth": {
+          "compute": 1,
+          "copy": 2,
+          "defend": 18,
+          "raid": 0,
+          "trade": 11,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 1432,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 796,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 374,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 291,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 380,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 333,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 402,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 205,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 181,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 76,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 92,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 158,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 13252,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 348,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 248,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 90,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 955,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 20,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 320,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 326,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 6,
+    "metrics": {
+      "entropy": 6.128,
+      "compression_ratio": 2.8,
+      "copy_score_mean": 0.199,
+      "wealth_total": 1461,
+      "currency_total": 358483,
+      "bribes_paid": 35,
+      "bribes_accepted": 3,
+      "raids_attempted": 32,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 32
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 1229,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 19,
+          "raid": 0,
+          "trade": 12,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 1794,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 1158,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 700,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 405,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 282885,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 368,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 270,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 41,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 83,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 19,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 345,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 349,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 7,
+    "metrics": {
+      "entropy": 6.116,
+      "compression_ratio": 2.85,
+      "copy_score_mean": 0.198,
+      "wealth_total": 1462,
+      "currency_total": 7305324,
+      "bribes_paid": 35,
+      "bribes_accepted": 1,
+      "raids_attempted": 34,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 34
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 761,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 20,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 2120,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 430,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 7231708,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 388,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 292,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 17,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 35,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 19,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 345,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 372,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 8,
+    "metrics": {
+      "entropy": 6.104,
+      "compression_ratio": 2.9,
+      "copy_score_mean": 0.198,
+      "wealth_total": 1464,
+      "currency_total": 184826685,
+      "bribes_paid": 35,
+      "bribes_accepted": 1,
+      "raids_attempted": 34,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 34
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 293,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 21,
+          "raid": 0,
+          "trade": 14,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 2446,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 455,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 184753169,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 408,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 314,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 17,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 10,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 19,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 345,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 372,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 9,
+    "metrics": {
+      "entropy": 6.092,
+      "compression_ratio": 2.95,
+      "copy_score_mean": 0.198,
+      "wealth_total": 1469,
+      "currency_total": 184844021,
+      "bribes_paid": 35,
+      "bribes_accepted": 0,
+      "raids_attempted": 35,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 35
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 151,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 24,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 2159,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 455,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 184753169,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 18151,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 336,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 17,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 10,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 19,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 345,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 372,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  },
+  {
+    "tick": 10,
+    "metrics": {
+      "entropy": 6.08,
+      "compression_ratio": 3.0,
+      "copy_score_mean": 0.198,
+      "wealth_total": 1474,
+      "currency_total": 185339764,
+      "bribes_paid": 35,
+      "bribes_accepted": 0,
+      "raids_attempted": 35,
+      "raids_won_by_merc": 0,
+      "raids_won_by_knight": 35
+    },
+    "agents": [
+      {
+        "id": "K-00",
+        "role": "king",
+        "currency": 9,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 27,
+          "raid": 0,
+          "trade": 18,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "K-01",
+        "role": "king",
+        "currency": 21,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 18,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-00",
+        "role": "mercenary",
+        "currency": 126,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-01",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-02",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-03",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-00",
+        "role": "knight",
+        "currency": 455,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 16,
+          "raid": 3,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 7
+        }
+      },
+      {
+        "id": "M-04",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-05",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-06",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-07",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-08",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-09",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-10",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-11",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-01",
+        "role": "knight",
+        "currency": 184753169,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 12,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-02",
+        "role": "knight",
+        "currency": 516047,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 14,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "N-03",
+        "role": "knight",
+        "currency": 358,
+        "wealth": {
+          "compute": 4,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "K-02",
+        "role": "king",
+        "currency": 17,
+        "wealth": {
+          "compute": 0,
+          "copy": 1,
+          "defend": 22,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-12",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-13",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "K-03",
+        "role": "king",
+        "currency": 10,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 19,
+          "raid": 0,
+          "trade": 16,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-14",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 2,
+          "raid": 11,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-04",
+        "role": "knight",
+        "currency": 55888,
+        "wealth": {
+          "compute": 4,
+          "copy": 2,
+          "defend": 13,
+          "raid": 1,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-15",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-16",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "N-05",
+        "role": "knight",
+        "currency": 345,
+        "wealth": {
+          "compute": 3,
+          "copy": 4,
+          "defend": 17,
+          "raid": 1,
+          "trade": 0,
+          "sense": 7,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-06",
+        "role": "knight",
+        "currency": 372,
+        "wealth": {
+          "compute": 6,
+          "copy": 3,
+          "defend": 19,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-17",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 4,
+          "defend": 0,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-18",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-19",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "K-04",
+        "role": "king",
+        "currency": 3,
+        "wealth": {
+          "compute": 0,
+          "copy": 0,
+          "defend": 17,
+          "raid": 0,
+          "trade": 13,
+          "sense": 0,
+          "adapt": 0
+        }
+      },
+      {
+        "id": "M-20",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-21",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "N-07",
+        "role": "knight",
+        "currency": 12423,
+        "wealth": {
+          "compute": 6,
+          "copy": 4,
+          "defend": 20,
+          "raid": 1,
+          "trade": 0,
+          "sense": 10,
+          "adapt": 6
+        }
+      },
+      {
+        "id": "M-22",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "N-08",
+        "role": "knight",
+        "currency": 239,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 19,
+          "raid": 2,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-23",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 5,
+          "defend": 2,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-24",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 0,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-25",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 3,
+          "defend": 0,
+          "raid": 10,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-26",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-27",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 5,
+          "defend": 2,
+          "raid": 9,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-28",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 1,
+          "raid": 10,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "N-09",
+        "role": "knight",
+        "currency": 282,
+        "wealth": {
+          "compute": 5,
+          "copy": 3,
+          "defend": 13,
+          "raid": 3,
+          "trade": 0,
+          "sense": 9,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-29",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 6,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 4,
+          "adapt": 5
+        }
+      },
+      {
+        "id": "M-30",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 3,
+          "defend": 1,
+          "raid": 8,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 4
+        }
+      },
+      {
+        "id": "M-31",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 6,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 6,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-32",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 2,
+          "copy": 6,
+          "defend": 0,
+          "raid": 8,
+          "trade": 0,
+          "sense": 5,
+          "adapt": 3
+        }
+      },
+      {
+        "id": "M-33",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 3,
+          "copy": 5,
+          "defend": 2,
+          "raid": 12,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 2
+        }
+      },
+      {
+        "id": "M-34",
+        "role": "mercenary",
+        "currency": 0,
+        "wealth": {
+          "compute": 1,
+          "copy": 4,
+          "defend": 1,
+          "raid": 11,
+          "trade": 0,
+          "sense": 3,
+          "adapt": 3
+        }
+      }
+    ]
+  }
+]

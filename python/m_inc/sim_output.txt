@@ -1,0 +1,25 @@
+C:\Users\ryanf\github\act\milky-cubff\python\m_inc\core\schemas.py:27: UserWarning: Field name "copy" in "WealthTraitsSchema" shadows an attribute in parent "BaseModel"
+  class WealthTraitsSchema(BaseModel):
+
+======================================================================
+  M|inc Economic Simulation
+======================================================================
+
+Configuration:
+  Config: minc_default.yaml
+  Trace: bff_trace_medium.json
+  Output: C:\Users\ryanf\github\act\milky-cubff\python\m_inc\simulation_output
+  Ticks: 50
+
+[1/6] Loading configuration...
+Traceback (most recent call last):
+  File "C:\Users\ryanf\github\act\milky-cubff\python\m_inc\run_simulation.py", line 165, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ryanf\github\act\milky-cubff\python\m_inc\run_simulation.py", line 52, in main
+    print(f"      \u2713 Seed: {config.seed}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 6: character maps to <undefined>
