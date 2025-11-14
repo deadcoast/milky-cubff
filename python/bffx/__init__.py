@@ -23,8 +23,48 @@ DEFAULT_STEP_LIMIT = 8192  # Max instructions per interaction
 
 __version__ = "0.1.1"
 
+# Import analytics functions
+from .analytics import (
+    shannon_entropy_bits,
+    compress_ratio,
+    opcode_histogram,
+    top_programs,
+    hamming,
+)
+
+# Import snapshot functions
+from .snapshot import (
+    save_population_json_gz,
+    load_population_json_gz,
+)
+
+# Import soup classes
+from .soup import (
+    Soup,
+    PairOutcome,
+)
+
+# Import assay functions
+from .assay import (
+    assay_candidate,
+)
+
+# Import CLI
+from . import cli
+
 __all__ = [
     "PROGRAM_SIZE",
     "TAPE_SIZE",
     "DEFAULT_STEP_LIMIT",
+    "shannon_entropy_bits",
+    "compress_ratio",
+    "opcode_histogram",
+    "top_programs",
+    "hamming",
+    "save_population_json_gz",
+    "load_population_json_gz",
+    "Soup",
+    "PairOutcome",
+    "assay_candidate",
+    "cli",
 ]
