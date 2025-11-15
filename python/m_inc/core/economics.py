@@ -1,9 +1,30 @@
 """Pure economic calculation functions for M|inc."""
 
 import math
-from typing import List
+from dataclasses import dataclass
+from typing import List, Optional
 from .models import Agent
 from .config import EconomicConfig
+
+
+@dataclass
+class BribeOutcome:
+    """Outcome of a bribe attempt."""
+    accepted: bool
+    amount: int = 0
+    king_currency_delta: int = 0
+    merc_currency_delta: int = 0
+    king_wealth_leakage: float = 0.0
+    reason: Optional[str] = None
+
+
+@dataclass
+class DefendOutcome:
+    """Outcome of a defend contest."""
+    knight_wins: bool
+    stake: int
+    p_knight: float
+    bounty_frac: float = 0.07
 
 
 def sigmoid(x: float) -> float:
@@ -310,3 +331,132 @@ def pick_target_king(kings: List[Agent], config: EconomicConfig) -> Agent:
     )
     
     return sorted_kings[0]
+
+
+def resolve_bribe(king: Agent, merc: Agent, knights: List[Agent], 
+                  config: EconomicConfig) -> BribeOutcome:
+    """Resolve a bribe attempt between a king and mercenary.
+    
+    The king can avoid a raid by offering a bribe. The bribe succeeds if:
+    1. The king's bribe threshold >= computed raid value
+    2. The king has sufficient currency to pay the threshold
+    
+    Args:
+        king: King agent attempting to bribe
+        merc: Mercenary agent being bribed
+        knights: List of defending knights
+        config: Economic configuration
+        
+    Returns:
+        BribeOutcome with success status and transfer details
+    """
+    rv = raid_value(merc, king, knights, config)
+    threshold = king.bribe_threshold
+    
+    # Check if threshold is sufficient
+    if threshold < rv:
+        return BribeOutcome(
+            accepted=False,
+            reason="threshold_too_low"
+        )
+    
+    # Check if king has sufficient currency
+    if king.currency < threshold:
+        return BribeOutcome(
+            accepted=False,
+            reason="insufficient_funds"
+        )
+    
+    # Bribe succeeds
+    return BribeOutcome(
+        accepted=True,
+        amount=threshold,
+        king_currency_delta=-threshold,
+        merc_currency_delta=threshold,
+        king_wealth_leakage=config.bribe_leakage
+    )
+
+
+def resolve_defend(knight: Agent, merc: Agent, config: EconomicConfig) -> DefendOutcome:
+    """Resolve a defend contest between a knight and mercenary.
+    
+    The knight defends their employer king against a mercenary raid.
+    Winner is determined by p_knight_win probability with deterministic
+    tie-breaking using agent IDs.
+    
+    Args:
+        knight: Knight agent defending
+        merc: Mercenary agent raiding
+        config: Economic configuration
+        
+    Returns:
+        DefendOutcome with winner and transfer details
+    """
+    p_knight = p_knight_win(knight, merc, config)
+    stake = stake_amount(knight, merc, config)
+    knight_wins = resolve_knight_wins(p_knight, knight.id, merc.id)
+    
+    return DefendOutcome(
+        knight_wins=knight_wins,
+        stake=stake,
+        p_knight=p_knight,
+        bounty_frac=0.07
+    )
+
+
+def apply_bribe_outcome(king: Agent, merc: Agent, outcome: BribeOutcome) -> None:
+    """Apply the effects of a bribe outcome to agents.
+    
+    Args:
+        king: King agent
+        merc: Mercenary agent
+        outcome: BribeOutcome to apply
+    """
+    if not outcome.accepted:
+        return
+    
+    # Transfer currency
+    king.add_currency(outcome.king_currency_delta)
+    merc.add_currency(outcome.merc_currency_delta)
+    
+    # Apply wealth leakage to king
+    if outcome.king_wealth_leakage > 0:
+        apply_bribe_leakage(king, outcome.king_wealth_leakage)
+
+
+def apply_wealth_leakage(king: Agent, leakage_frac: float) -> None:
+    """Apply wealth leakage to a king.
+    
+    This is an alias for apply_bribe_leakage for consistency.
+    
+    Args:
+        king: King agent
+        leakage_frac: Fraction of wealth to leak
+    """
+    apply_bribe_leakage(king, leakage_frac)
+
+
+def apply_defend_outcome(knight: Agent, merc: Agent, king: Agent, 
+                        outcome: DefendOutcome, config: EconomicConfig) -> None:
+    """Apply the effects of a defend contest outcome to agents.
+    
+    Args:
+        knight: Knight agent
+        merc: Mercenary agent
+        king: King agent (employer)
+        outcome: DefendOutcome to apply
+        config: Economic configuration
+    """
+    if outcome.knight_wins:
+        # Knight wins: transfer stake from merc to knight
+        merc.add_currency(-outcome.stake)
+        knight.add_currency(outcome.stake)
+        
+        # Apply bounty from merc to knight
+        apply_bounty(knight, merc, outcome.bounty_frac)
+    else:
+        # Mercenary wins: apply mirrored losses from king to merc
+        apply_mirrored_losses(king, merc, config)
+        
+        # Deduct stake from knight
+        knight.add_currency(-outcome.stake)

@@ -14,8 +14,14 @@
 
 
 
-- [ ] 2. Implement core data models and type definitions
-  - [ ] 2.1 Create `core/models.py` with Agent, WealthTraits, Role, Event, EventType dataclasses
+- [x] 2. Implement core data models and type definitions
+
+
+
+
+  - [x] 2.1 Create `core/models.py` with Agent, WealthTraits, Role, Event, EventType dataclasses
+
+
     - Define Agent dataclass with all economic attributes
     - Define WealthTraits dataclass with seven trait fields and helper methods
     - Define Event dataclass with all event fields
@@ -25,7 +31,9 @@
     - Add validation methods to ensure non-negative values
     - _Requirements: 2.1, 2.2, 2.3, 3.1, 3.2, 3.3_
 
-  - [ ] 2.2 Create `core/schemas.py` with Pydantic schemas for validation
+  - [x] 2.2 Create `core/schemas.py` with Pydantic schemas for validation
+
+
     - Define AgentSchema for agent state validation
 
 
@@ -39,7 +47,9 @@
     - Add JSON schema export methods
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 2.3 Create `core/config.py` for configuration management
+  - [x] 2.3 Create `core/config.py` for configuration management
+
+
     - Implement ConfigLoader to parse YAML files
     - Implement config hash computation
 
@@ -53,8 +63,14 @@
 
 
 
-- [ ] 3. Implement Trace Reader component
-  - [ ] 3.1 Create `adapters/trace_reader.py` with TraceReader class
+- [x] 3. Implement Trace Reader component
+
+
+
+
+  - [x] 3.1 Create `adapters/trace_reader.py` with TraceReader class
+
+
     - Implement `__init__` to accept file path or stream
     - Implement `read_epoch()` to parse BFF trace data
     - Implement `get_tape_by_id()` for tape lookup
@@ -63,7 +79,9 @@
     - Add support for both JSON and binary trace formats
     - _Requirements: 1.3, 15.1, 15.3_
 
-  - [ ] 3.2 Add trace format detection and normalization
+  - [x] 3.2 Add trace format detection and normalization
+
+
     - Detect trace format (JSON, binary, stream)
 
     - Normalize data into EpochData structure
@@ -74,8 +92,15 @@
 
 
 
-- [ ] 4. Implement Agent Registry component
-  - [ ] 4.1 Create `core/agent_registry.py` with AgentRegistry class
+- [x] 4. Implement Agent Registry component
+
+
+
+
+
+  - [x] 4.1 Create `core/agent_registry.py` with AgentRegistry class
+
+
     - Implement `__init__` with RegistryConfig
     - Implement `assign_roles()` to map tape IDs to roles based on ratios
     - Implement `get_agent()` for agent lookup by ID
@@ -84,7 +109,9 @@
     - Implement `update_agent()` to persist agent state changes
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 4.2 Add agent initialization logic
+  - [x] 4.2 Add agent initialization logic
+
+
     - Initialize currency based on role (Kings: 5000-7000, Knights: 100-300, Mercs: 0-50)
 
     - Initialize wealth traits based on role distributions
@@ -101,7 +128,12 @@
 
 - [x] 5. Implement Economic Engine core
 
-  - [ ] 5.1 Create `core/economic_engine.py` with EconomicEngine class
+  - [x] 5.1 Create `core/economic_engine.py` with EconomicEngine class
+
+
+
+
+
     - Implement `__init__` with AgentRegistry and EconomicConfig
     - Implement `process_tick()` orchestration method
     - Implement tick sequence: drip → trade → retainer → interactions
@@ -112,7 +144,12 @@
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 9.1, 9.2_
 
 
-  - [ ] 5.2 Implement soup drip logic
+  - [x] 5.2 Implement soup drip logic
+
+
+
+
+
     - Create `_soup_drip()` method
     - Check copy trait threshold (>= 12)
     - Apply +1 copy every 2 ticks
@@ -120,7 +157,12 @@
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
 
-  - [ ] 5.3 Implement trade operations
+  - [x] 5.3 Implement trade operations
+
+
+
+
+
     - Create `_execute_trades()` method
     - Check King currency >= 100
     - Deduct 100 currency, add 3 defend + 2 trade wealth
@@ -128,7 +170,12 @@
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
 
-  - [ ] 5.4 Implement retainer payments
+  - [x] 5.4 Implement retainer payments
+
+
+
+
+
     - Create `_pay_retainers()` method
     - Iterate Knights with employers
     - Transfer retainer_fee from King to Knight if funds available
@@ -136,7 +183,12 @@
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 
-  - [ ] 5.5 Implement interaction orchestration
+  - [x] 5.5 Implement interaction orchestration
+
+
+
+
+
     - Create `_execute_interactions()` method
     - Iterate Mercenaries in ID order
     - Select target King deterministically (highest wealth_exposed)
@@ -144,8 +196,15 @@
     - Route to bribe evaluation or contest
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 6. Implement economic calculation functions
-  - [ ] 6.1 Create `core/economics.py` with pure calculation functions
+- [x] 6. Implement economic calculation functions
+
+
+
+
+
+
+  - [x] 6.1 Create `core/economics.py` with pure calculation functions
+
     - Implement `wealth_total(agent)` to sum all traits
     - Implement `wealth_exposed(agent, config)` with exposure factors
     - Implement `king_defend_projection(king, knights, attackers, config)`
@@ -154,14 +213,17 @@
     - Implement `clamp(value, min, max)` helper function
     - _Requirements: 4.5, 8.1, 8.2_
 
-  - [ ] 6.2 Implement bribe resolution logic
+
+  - [x] 6.2 Implement bribe resolution logic
+
     - Create `resolve_bribe(king, merc, knights, config)` function
     - Compute raid_value
     - Check threshold >= raid_value AND currency >= threshold
     - Return BribeOutcome with transfers and leakage
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ] 6.3 Implement defend resolution logic
+  - [x] 6.3 Implement defend resolution logic
+
     - Create `p_knight_win(knight, merc, config)` function
     - Compute trait delta and sigmoid transformation
     - Apply clamp to [0.05, 0.95]
@@ -170,7 +232,8 @@
     - Return DefendOutcome with winner and transfers
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 6.4 Implement wealth and currency transfer functions
+  - [x] 6.4 Implement wealth and currency transfer functions
+
     - Create `apply_bribe_outcome(king, merc, outcome)` function
     - Create `apply_wealth_leakage(king, leakage_frac)` function
     - Create `apply_mirrored_losses(king, merc, config)` function
@@ -178,8 +241,14 @@
     - Ensure all transfers maintain non-negative invariants
     - _Requirements: 3.5, 4.3, 5.4, 5.5_
 
-- [ ] 7. Implement Policy DSL Compiler
-  - [ ] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
+- [x] 7. Implement Policy DSL Compiler
+
+
+
+
+  - [x] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
+
+
     - Implement `__init__` to accept YAML config
     - Implement `compile()` to generate CompiledPolicies
     - Implement `validate()` to check policy syntax
@@ -187,7 +256,9 @@
     - Generate callable functions from YAML definitions
     - _Requirements: 11.1, 11.2, 11.4_
 
-  - [ ] 7.2 Add policy function generators
+  - [x] 7.2 Add policy function generators
+
+
     - Generate `bribe_outcome` callable from YAML
     - Generate `raid_value` callable from YAML
     - Generate `p_knight_win` callable from YAML
@@ -195,14 +266,26 @@
     - Ensure generated functions are pure (no side effects)
     - _Requirements: 8.1, 8.2_
 
-  - [ ]* 7.3 Add policy validation and testing
+  - [x] 7.3 Add policy validation and testing
+
+
+
+
+
+
     - Validate formula syntax before compilation
     - Test generated functions against known inputs
     - Verify determinism of compiled policies
     - _Requirements: 8.1, 8.2, 11.5_
 
-- [ ] 8. Implement Cache Layer
-  - [ ] 8.1 Create `core/cache.py` with CacheLayer class
+- [x] 8. Implement Cache Layer
+
+
+
+
+
+  - [x] 8.1 Create `core/cache.py` with CacheLayer class
+
     - Implement `__init__` with CacheConfig
     - Implement `get_or_compute(state, compute_fn)` with memoization
     - Implement `invalidate(reason)` to clear cache
@@ -210,7 +293,9 @@
     - Use LRU eviction policy with configurable max size
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [ ] 8.2 Implement canonical state computation
+  - [x] 8.2 Implement canonical state computation
+
+
     - Create `compute_canonical_state(agents)` function
     - Sort agents by ID for deterministic ordering
     - Extract relevant fields (role, currency, wealth)
@@ -229,7 +314,12 @@
 
 - [x] 9. Implement Signal Processor
 
-  - [ ] 9.1 Create `core/signals.py` with SignalProcessor class
+  - [x] 9.1 Create `core/signals.py` with SignalProcessor class
+
+
+
+
+
     - Implement `__init__` with SignalConfig
     - Implement `process_events(events)` to route to channels
     - Implement `update_refractory(tick_num)` to manage cooldowns
@@ -237,7 +327,11 @@
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
 
-  - [ ] 9.2 Add event queuing and coalescing
+  - [x] 9.2 Add event queuing and coalescing
+
+
+
+
     - Queue events that occur during refractory periods
     - Coalesce queued events when refractory expires
     - Apply priority-based scheduling
@@ -247,8 +341,15 @@
 
     - _Requirements: 13.3, 13.4_
 
-- [ ] 10. Implement Event Aggregator
-  - [ ] 10.1 Create `core/event_aggregator.py` with EventAggregator class
+- [x] 10. Implement Event Aggregator
+
+
+
+
+
+  - [x] 10.1 Create `core/event_aggregator.py` with EventAggregator class
+
+
     - Implement `__init__` to initialize aggregation state
     - Implement `add_event(event)` to collect events
 
@@ -259,7 +360,8 @@
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
 
-  - [ ] 10.2 Add metrics computation
+  - [x] 10.2 Add metrics computation
+
     - Compute entropy from agent wealth distribution
     - Compute compression ratio proxy
 

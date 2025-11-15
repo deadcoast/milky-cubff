@@ -86,7 +86,7 @@ class TraceReader:
                 header = f.read(2)
                 if header == b'\x1f\x8b':  # gzip magic number
                     self._format = "json_gz"
-                elif header[0:1] == b'{':  # JSON starts with {
+                elif header[0:1] == b'{' or header[0:1] == b'[':  # JSON starts with { or [
                     self._format = "json"
                 else:
                     self._format = "binary"
@@ -108,30 +108,24 @@ class TraceReader:
     
     def _read_epoch_json(self) -> Optional[EpochData]:
         """Read epoch from JSON file."""
-        if not self._file_handle:
+        # Load JSON data on first call
+        if not hasattr(self, '_json_data'):
             if self._format == "json_gz":
-                self._file_handle = gzip.open(self.source, 'rt', encoding='utf-8')
+                with gzip.open(self.source, 'rt', encoding='utf-8') as f:
+                    data = json.load(f)
             else:
-                self._file_handle = open(self.source, 'r', encoding='utf-8')
+                with open(self.source, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
             
-            # Load entire JSON (could be single object or array)
-            try:
-                data = json.load(self._file_handle)
-                self._file_handle.close()
-                self._file_handle = None
-                
-                # Store data for iteration
-                if isinstance(data, list):
-                    self._json_data = data
-                    self._json_index = 0
-                else:
-                    self._json_data = [data]
-                    self._json_index = 0
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Invalid JSON in trace file: {e}")
+            # Store data for iteration
+            if isinstance(data, list):
+                self._json_data = data
+            else:
+                self._json_data = [data]
+            self._json_index = 0
         
         # Return next epoch from loaded data
-        if hasattr(self, '_json_data') and self._json_index < len(self._json_data):
+        if self._json_index < len(self._json_data):
             epoch_data = self._json_data[self._json_index]
             self._json_index += 1
             return self._parse_json_epoch(epoch_data)
@@ -150,7 +144,6 @@ class TraceReader:
         }
         """
         epoch_num = data.get("epoch", self.current_epoch)
-        self.current_epoch = epoch_num + 1
         
         # Parse tapes
         tapes = {}
