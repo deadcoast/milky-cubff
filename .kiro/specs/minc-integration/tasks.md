@@ -283,14 +283,14 @@
     - Implement `validate_schema(data, schema_name)` for validation
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 11.2 Add JSON serialization
+  - [x] 11.2 Add JSON serialization
     - Serialize TickResult to JSON with proper formatting
     - Include metadata (version, seed, config_hash, timestamp)
     - Handle numpy types and custom objects
     - Support optional compression (gzip)
     - _Requirements: 10.1, 10.4_
 
-  - [ ] 11.3 Add CSV serialization
+  - [x] 11.3 Add CSV serialization
     - Write event log with proper column ordering
     - Write final agent state with all attributes
     - Handle missing values gracefully
