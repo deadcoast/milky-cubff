@@ -14,8 +14,8 @@
 
 
 
-- [ ] 2. Implement core data models and type definitions
-  - [ ] 2.1 Create `core/models.py` with Agent, WealthTraits, Role, Event, EventType dataclasses
+- [x] 2. Implement core data models and type definitions
+  - [x] 2.1 Create `core/models.py` with Agent, WealthTraits, Role, Event, EventType dataclasses
     - Define Agent dataclass with all economic attributes
     - Define WealthTraits dataclass with seven trait fields and helper methods
     - Define Event dataclass with all event fields
@@ -25,7 +25,7 @@
     - Add validation methods to ensure non-negative values
     - _Requirements: 2.1, 2.2, 2.3, 3.1, 3.2, 3.3_
 
-  - [ ] 2.2 Create `core/schemas.py` with Pydantic schemas for validation
+  - [x] 2.2 Create `core/schemas.py` with Pydantic schemas for validation
     - Define AgentSchema for agent state validation
 
 
@@ -39,7 +39,7 @@
     - Add JSON schema export methods
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 2.3 Create `core/config.py` for configuration management
+  - [x] 2.3 Create `core/config.py` for configuration management
     - Implement ConfigLoader to parse YAML files
     - Implement config hash computation
 
