@@ -1,6 +1,5 @@
 """Unit tests for core data models."""
 
-import pytest
 from core.models import Agent, WealthTraits, Role, Event, EventType, TickMetrics, TickResult, AgentSnapshot
 from core.schemas import validate_agent, validate_event, validate_tick_result, validate_config
 from core.config import ConfigLoader, MIncConfig
@@ -16,8 +15,11 @@ def test_wealth_traits_creation():
 
 def test_wealth_traits_non_negative():
     """Test that WealthTraits enforces non-negative values."""
-    with pytest.raises(ValueError):
+    try:
         WealthTraits(compute=-5, copy=10, defend=20, raid=5, trade=12, sense=8, adapt=6)
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        pass  # Expected
 
 
 def test_wealth_traits_scale():
@@ -60,7 +62,7 @@ def test_agent_creation():
 def test_agent_non_negative_currency():
     """Test that Agent enforces non-negative currency."""
     wealth = WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=12, sense=8, adapt=6)
-    with pytest.raises(ValueError):
+    try:
         Agent(
             id="K-01",
             tape_id=0,
@@ -68,6 +70,9 @@ def test_agent_non_negative_currency():
             currency=-100,
             wealth=wealth
         )
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        pass  # Expected
 
 
 def test_agent_add_currency():
@@ -227,9 +232,44 @@ def test_schema_validation_negative_currency():
         }
     }
     
-    with pytest.raises(Exception):  # Pydantic will raise validation error
+    try:
         validate_agent(agent_data)
+        assert False, "Should have raised validation error"
+    except Exception:
+        pass  # Expected
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    # Run all tests
+    tests = [
+        test_wealth_traits_creation,
+        test_wealth_traits_non_negative,
+        test_wealth_traits_scale,
+        test_wealth_traits_add,
+        test_agent_creation,
+        test_agent_non_negative_currency,
+        test_agent_add_currency,
+        test_event_creation,
+        test_tick_metrics_creation,
+        test_agent_to_dict_from_dict,
+        test_config_loader_default,
+        test_config_hash,
+        test_config_validation,
+        test_schema_validation,
+        test_schema_validation_negative_currency,
+    ]
+    
+    print("Running core models tests...")
+    passed = 0
+    failed = 0
+    
+    for test in tests:
+        try:
+            test()
+            print(f"✓ {test.__name__}")
+            passed += 1
+        except Exception as e:
+            print(f"✗ {test.__name__}: {e}")
+            failed += 1
+    
+    print(f"\n{passed} passed, {failed} failed")

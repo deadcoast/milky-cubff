@@ -53,8 +53,8 @@
 
 
 
-- [ ] 3. Implement Trace Reader component
-  - [ ] 3.1 Create `adapters/trace_reader.py` with TraceReader class
+- [x] 3. Implement Trace Reader component
+  - [x] 3.1 Create `adapters/trace_reader.py` with TraceReader class
     - Implement `__init__` to accept file path or stream
     - Implement `read_epoch()` to parse BFF trace data
     - Implement `get_tape_by_id()` for tape lookup
@@ -63,7 +63,7 @@
     - Add support for both JSON and binary trace formats
     - _Requirements: 1.3, 15.1, 15.3_
 
-  - [ ] 3.2 Add trace format detection and normalization
+  - [x] 3.2 Add trace format detection and normalization
     - Detect trace format (JSON, binary, stream)
 
     - Normalize data into EpochData structure
