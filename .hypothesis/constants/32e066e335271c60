@@ -1,0 +1,4 @@
+# file: /Users/deadcoast/github/milky-cubff/python/m_inc/core/cache.py
+# hypothesis_version: 6.148.5
+
+[0.0, 'CanonicalState', 'T', 'agents', 'config_hash', 'currency', 'evictions', 'hit_rate', 'hits', 'id', 'invalidations', 'misses', 'role', 'wealth', 'witness_failures', 'witness_validations']

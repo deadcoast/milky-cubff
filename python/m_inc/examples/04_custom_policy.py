@@ -168,14 +168,8 @@ def run_simulation(trace_file, config_file, num_ticks):
     # Initialize components
     trace_reader = TraceReader(trace_file)
     
-    registry_config = RegistryConfig(
-        role_ratios=config.roles.ratios,
-        seed=config.seed
-    )
-    registry = AgentRegistry(registry_config)
-    
-    economic_config = EconomicConfig.from_dict(config.economic)
-    engine = EconomicEngine(registry, economic_config)
+    registry = AgentRegistry(config.registry)
+    engine = EconomicEngine(registry, config.economic, config.trait_emergence)
     
     # Assign roles
     epoch = trace_reader.read_epoch()

@@ -388,7 +388,7 @@
     - Test performance benchmarks
     - _Requirements: 8.5, 10.5_
 
-  - [ ]* 15.5 Create property-based tests
+  - [x] 15.5 Create property-based tests
     - Test currency/wealth conservation invariants
     - Test non-negativity invariants
     - Test deterministic resolution properties
@@ -416,34 +416,34 @@
     - Provide code examples
     - _Requirements: 15.5_
 
-  - [ ]* 16.4 Create visualization examples
+  - [x] 16.4 Create visualization examples
     - Plot wealth distribution over time
     - Plot currency flows between roles
     - Plot event frequency heatmaps
     - Plot agent trajectories
     - _Requirements: 9.3, 9.4_
 
-- [ ] 17. Perform integration validation
-  - [ ] 17.1 Run M|inc on existing BFF traces
+- [x] 17. Perform integration validation
+  - [x] 17.1 Run M|inc on existing BFF traces
     - Process traces from `testdata/`
     - Verify outputs match expected schemas
     - Check for errors or warnings
     - _Requirements: 15.1, 15.3_
 
-  - [ ] 17.2 Validate determinism
+  - [x] 17.2 Validate determinism
     - Run same trace with same seed multiple times
     - Verify bit-identical outputs
     - Test across different Python versions
     - _Requirements: 8.5_
 
-  - [ ] 17.3 Validate performance
+  - [x] 17.3 Validate performance
     - Benchmark tick processing speed
     - Measure cache hit rates
     - Profile memory usage
     - Optimize bottlenecks if needed
     - _Requirements: 12.1, 12.2, 12.3_
 
-  - [ ] 17.4 Validate against 0.1.1 spec outputs
+  - [x] 17.4 Validate against 0.1.1 spec outputs
     - Compare outputs with reference data in `docs/0.1.1/database/`
     - Verify metrics match expected values
     - Verify event sequences match expected patterns

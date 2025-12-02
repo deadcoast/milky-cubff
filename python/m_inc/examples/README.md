@@ -103,6 +103,48 @@ python 04_custom_policy.py
 
 ---
 
+### 05_visualize_outputs.py
+
+**Purpose**: Create visualizations from M|inc output files
+
+**What it demonstrates**:
+- Loading and visualizing tick data
+- Plotting wealth distribution over time
+- Visualizing currency flows between roles
+- Creating event frequency heatmaps
+- Plotting individual agent trajectories
+- Analyzing wealth trait breakdowns
+
+**Usage**:
+```bash
+cd python/m_inc/examples
+
+# Display plots interactively
+python 05_visualize_outputs.py
+
+# Save plots to files
+python 05_visualize_outputs.py --save
+
+# Use custom output directory
+python 05_visualize_outputs.py --output-dir /path/to/output --save
+```
+
+**Requirements**: 
+- Run `01_process_historical_trace.py` first to generate output files
+- Install visualization dependencies:
+```bash
+pip install matplotlib seaborn
+```
+
+**Output**: Creates visualization plots:
+- `wealth_distribution.png`: Wealth by role over time
+- `currency_flows.png`: Currency transfers between roles
+- `event_heatmap.png`: Event frequency over time
+- `agent_trajectories.png`: Individual agent wealth paths
+- `wealth_traits.png`: Breakdown of wealth traits
+
+---
+
 ## Running All Examples
 
 To run all examples in sequence:
@@ -115,6 +157,9 @@ python 01_process_historical_trace.py
 
 # Analyze the outputs
 python 03_analyze_outputs.py
+
+# Visualize the outputs
+python 05_visualize_outputs.py --save
 
 # Compare custom policies
 python 04_custom_policy.py

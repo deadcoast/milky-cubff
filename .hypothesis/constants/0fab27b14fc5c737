@@ -1,0 +1,4 @@
+# file: /Users/deadcoast/github/milky-cubff/python/m_inc/core/agent_registry.py
+# hypothesis_version: 6.148.5
+
+[100, 300, 500, '-', 'K', 'M', 'N', 'adapt', 'agents', 'avg_currency', 'avg_wealth', 'compute', 'copy', 'defend', 'king', 'kings', 'knight', 'knights', 'mercenaries', 'raid', 'sense', 'stats', 'total_agents', 'total_currency', 'total_wealth', 'trade']

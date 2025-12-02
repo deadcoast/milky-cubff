@@ -1,0 +1,4 @@
+# file: /Users/deadcoast/github/milky-cubff/python/m_inc/core/config.py
+# hypothesis_version: 6.148.5
+
+[0.0, 0.01, 0.05, 0.08, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.95, 1.0, 100, 300, 1337, 5000, 7000, 10000, '0.1.1', 'adapt', 'alpha_raid', 'base_knight_winrate', 'beta_sense_adapt', 'bribe', 'bribe_leakage', 'cache', 'clamp_max', 'clamp_min', 'compress', 'compute', 'condition', 'copy', 'created_wealth_units', 'csv_events', 'csv_final_agents', 'defend', 'defend_resolution', 'delta', 'delta_king_exposed', 'distribution', 'economic', 'employment_bonus', 'enabled', 'exposure_factors', 'gamma_king_defend', 'invest_per_tick', 'json_ticks', 'king', 'knight', 'max_size', 'mercenary', 'mutation_rate', 'on_failed_bribe', 'output', 'r', 'raid', 'raid_value_weights', 'ratios', 'refractory', 'roles', 'rules', 'seed', 'sense', 'stake_currency_frac', 'trade', 'trait_emergence', 'version', 'w', 'witness_sample_rate']

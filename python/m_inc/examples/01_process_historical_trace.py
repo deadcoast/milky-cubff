@@ -43,7 +43,7 @@ def main():
     # Load configuration
     print("Loading configuration...")
     config = ConfigLoader.load(config_file)
-    print(f"  Role ratios: {config.roles.ratios}")
+    print(f"  Role ratios: {config.registry.role_ratios}")
     print(f"  Cache enabled: {config.cache.enabled}")
     print()
     
@@ -51,14 +51,8 @@ def main():
     print("Initializing components...")
     trace_reader = TraceReader(trace_file)
     
-    registry_config = RegistryConfig(
-        role_ratios=config.roles.ratios,
-        seed=config.seed
-    )
-    registry = AgentRegistry(registry_config)
-    
-    economic_config = EconomicConfig.from_dict(config.economic)
-    engine = EconomicEngine(registry, economic_config)
+    registry = AgentRegistry(config.registry)
+    engine = EconomicEngine(registry, config.economic, config.trait_emergence)
     
     output_config = OutputConfig(
         json_ticks=True,
@@ -112,6 +106,7 @@ def main():
     
     # Write final outputs
     print("Writing final outputs...")
+    writer.flush_ticks()  # Write accumulated tick snapshots
     writer.write_event_csv(all_events)
     
     all_agents = []

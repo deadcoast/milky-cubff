@@ -1,0 +1,4 @@
+# file: /Users/deadcoast/github/milky-cubff/python/m_inc/core/economics.py
+# hypothesis_version: 6.148.5
+
+[0.0, 0.07, 0.25, 0.5, 1.0, 'adapt', 'alpha_raid', 'base_knight_winrate', 'beta_sense_adapt', 'clamp_max', 'clamp_min', 'compute', 'copy', 'created_wealth_units', 'defend', 'delta_king_exposed', 'distribution', 'employment_bonus', 'gamma_king_defend', 'insufficient_funds', 'invest_per_tick', 'raid', 'sense', 'stake_currency_frac', 'success', 'threshold_too_low', 'trade']

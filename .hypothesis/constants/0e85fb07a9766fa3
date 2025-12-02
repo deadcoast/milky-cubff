@@ -1,0 +1,4 @@
+# file: /Users/deadcoast/github/milky-cubff/python/m_inc/core/models.py
+# hypothesis_version: 6.148.5
+
+['Agent', 'AgentSnapshot', 'Event', 'WealthTraits', 'adapt', 'agent', 'agents', 'alive', 'amount', 'bribe_accept', 'bribe_threshold', 'bribes_accepted', 'bribes_paid', 'compression_ratio', 'compute', 'copy', 'copy_score_mean', 'currency', 'currency_total', 'defend', 'defend_loss', 'defend_win', 'delta', 'employer', 'entropy', 'id', 'invest', 'king', 'knight', 'merc', 'mercenary', 'metrics', 'notes', 'p_knight', 'raid', 'raids_attempted', 'raids_won_by_knight', 'raids_won_by_merc', 'retainer', 'retainer_fee', 'role', 'rv', 'sense', 'stake', 'tape_id', 'threshold', 'tick', 'trade', 'trait', 'trait_drip', 'type', 'unopposed_raid', 'wealth', 'wealth_created', 'wealth_total']

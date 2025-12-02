@@ -434,6 +434,99 @@ tick,type,king,knight,merc,amount,stake,p_knight,notes
 1,defend_win,K-01,N-07,M-19,,250,0.52,
 ```
 
+## Visualization
+
+M|inc includes visualization tools to analyze economic dynamics through plots and charts.
+
+### Installation
+
+Install visualization dependencies:
+
+```bash
+pip install matplotlib seaborn
+```
+
+### Creating Visualizations
+
+Use the visualization example script:
+
+```bash
+cd examples
+
+# Display plots interactively
+python 05_visualize_outputs.py
+
+# Save plots to files
+python 05_visualize_outputs.py --save
+
+# Use custom output directory
+python 05_visualize_outputs.py --output-dir /path/to/output --save
+```
+
+### Available Visualizations
+
+#### Wealth Distribution Over Time
+
+Shows how total wealth evolves for each role (Kings, Knights, Mercenaries):
+- Absolute wealth by role
+- Percentage distribution (stacked area)
+
+#### Currency Flows
+
+Visualizes currency transfers between roles:
+- Currency holdings over time
+- Flow totals by type (bribes, retainers, stakes)
+- Final currency distribution (pie chart)
+
+#### Event Frequency Heatmap
+
+Displays when different event types occur throughout the simulation:
+- Event counts by tick and type
+- Color-coded intensity
+
+#### Agent Trajectories
+
+Tracks individual agent wealth paths:
+- Top N agents by final wealth
+- Wealth distribution statistics (mean, median, percentiles)
+
+#### Wealth Traits Breakdown
+
+Shows evolution of individual wealth traits:
+- Stacked area chart of all traits
+- Individual trait lines
+
+### Programmatic Visualization
+
+Create custom visualizations using the data loading functions:
+
+```python
+from pathlib import Path
+import json
+
+# Load tick data
+output_dir = Path("output/")
+with open(output_dir / "ticks.json", 'r') as f:
+    tick_data = json.load(f)
+
+# Extract wealth by role
+for tick in tick_data:
+    agents = tick['agents']
+    king_wealth = sum(sum(a['wealth'].values()) 
+                     for a in agents if a['role'] == 'king')
+    print(f"Tick {tick['tick']}: Kings have {king_wealth} wealth")
+
+# Load event data
+import pandas as pd
+events = pd.read_csv(output_dir / "events.csv")
+
+# Analyze event patterns
+event_counts = events['type'].value_counts()
+print(event_counts)
+```
+
+See `examples/05_visualize_outputs.py` for complete implementation examples.
+
 ## API Documentation
 
 ### Core Classes
