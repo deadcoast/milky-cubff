@@ -395,22 +395,22 @@
     - Test cache correctness
     - _Requirements: 3.5, 8.1, 8.2, 12.3_
 
-- [ ] 16. Create documentation and examples
-  - [ ] 16.1 Write `python/m_inc/README.md`
+- [x] 16. Create documentation and examples
+  - [x] 16.1 Write `python/m_inc/README.md`
     - Installation instructions
     - Quick start guide
     - Configuration reference
     - API documentation
     - _Requirements: 15.5_
 
-  - [ ] 16.2 Create usage examples
+  - [x] 16.2 Create usage examples
     - Example: Process historical BFF trace
     - Example: Run M|inc with live BFF simulation
     - Example: Analyze M|inc outputs
     - Example: Custom policy configuration
     - _Requirements: 15.2, 15.5_
 
-  - [ ] 16.3 Create API reference documentation
+  - [x] 16.3 Create API reference documentation
     - Document all public classes and functions
     - Include type signatures and docstrings
     - Provide code examples
