@@ -1,9 +1,28 @@
 """Pure economic calculation functions for M|inc."""
 
 import math
-from typing import List
+from typing import List, NamedTuple, Optional
 from .models import Agent
 from .config import EconomicConfig
+
+
+class BribeOutcome(NamedTuple):
+    """Outcome of a bribe evaluation."""
+    accepted: bool
+    amount: int = 0
+    king_currency_delta: int = 0
+    merc_currency_delta: int = 0
+    king_wealth_leakage: float = 0.0
+    reason: Optional[str] = None
+
+
+class DefendOutcome(NamedTuple):
+    """Outcome of a defend contest."""
+    knight_wins: bool
+    stake: int
+    p_knight: float
+    knight_id: str
+    merc_id: str
 
 
 def sigmoid(x: float) -> float:
@@ -310,3 +329,96 @@ def pick_target_king(kings: List[Agent], config: EconomicConfig) -> Agent:
     )
     
     return sorted_kings[0]
+
+
+def resolve_bribe(king: Agent, merc: Agent, knights: List[Agent],
+                  config: EconomicConfig) -> BribeOutcome:
+    """Resolve bribe evaluation between king and mercenary.
+    
+    Bribe succeeds if:
+    1. King's bribe threshold >= raid_value, AND
+    2. King has sufficient currency >= threshold
+    
+    Args:
+        king: King agent
+        merc: Mercenary agent
+        knights: List of defending knights
+        config: Economic configuration
+        
+    Returns:
+        BribeOutcome with acceptance status and transfer details
+    """
+    # Compute raid value
+    rv = raid_value(merc, king, knights, config)
+    threshold = king.bribe_threshold
+    
+    # Check if bribe succeeds
+    if threshold >= rv and king.currency >= threshold:
+        return BribeOutcome(
+            accepted=True,
+            amount=threshold,
+            king_currency_delta=-threshold,
+            merc_currency_delta=threshold,
+            king_wealth_leakage=config.bribe_leakage,
+            reason="success"
+        )
+    elif threshold >= rv:
+        return BribeOutcome(
+            accepted=False,
+            reason="insufficient_funds"
+        )
+    else:
+        return BribeOutcome(
+            accepted=False,
+            reason="threshold_too_low"
+        )
+
+
+def resolve_defend(knight: Agent, merc: Agent, config: EconomicConfig) -> DefendOutcome:
+    """Resolve a defend contest between knight and mercenary.
+    
+    Computes win probability and resolves deterministically using
+    tie-breaking (knight.id < merc.id when p = 0.5).
+    
+    Args:
+        knight: Knight agent
+        merc: Mercenary agent
+        config: Economic configuration
+        
+    Returns:
+        DefendOutcome with winner and transfer details
+    """
+    # Compute win probability
+    p_knight = p_knight_win(knight, merc, config)
+    
+    # Compute stake
+    stake = stake_amount(knight, merc, config)
+    
+    # Resolve deterministically
+    knight_wins = resolve_knight_wins(p_knight, knight.id, merc.id)
+    
+    return DefendOutcome(
+        knight_wins=knight_wins,
+        stake=stake,
+        p_knight=p_knight,
+        knight_id=knight.id,
+        merc_id=merc.id
+    )
+
+
+def apply_bribe_outcome(king: Agent, merc: Agent, outcome: BribeOutcome) -> None:
+    """Apply the outcome of a bribe to king and mercenary.
+    
+    Args:
+        king: King agent
+        merc: Mercenary agent
+        outcome: BribeOutcome to apply
+    """
+    if outcome.accepted:
+        # Transfer currency
+        king.add_currency(outcome.king_currency_delta)
+        merc.add_currency(outcome.merc_currency_delta)
+        
+        # Apply wealth leakage to king
+        if outcome.king_wealth_leakage > 0:
+            apply_bribe_leakage(king, outcome.king_wealth_leakage)

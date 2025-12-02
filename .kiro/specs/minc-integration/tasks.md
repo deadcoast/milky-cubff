@@ -112,7 +112,7 @@
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 9.1, 9.2_
 
 
-  - [-] 5.2 Implement soup drip logic
+  - [x] 5.2 Implement soup drip logic
     - Create `_soup_drip()` method
     - Check copy trait threshold (>= 12)
     - Apply +1 copy every 2 ticks
@@ -120,7 +120,7 @@
     - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
 
-  - [ ] 5.3 Implement trade operations
+  - [x] 5.3 Implement trade operations
     - Create `_execute_trades()` method
     - Check King currency >= 100
     - Deduct 100 currency, add 3 defend + 2 trade wealth
@@ -128,7 +128,7 @@
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
 
-  - [ ] 5.4 Implement retainer payments
+  - [x] 5.4 Implement retainer payments
     - Create `_pay_retainers()` method
     - Iterate Knights with employers
     - Transfer retainer_fee from King to Knight if funds available
@@ -136,7 +136,7 @@
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 
-  - [ ] 5.5 Implement interaction orchestration
+  - [x] 5.5 Implement interaction orchestration
     - Create `_execute_interactions()` method
     - Iterate Mercenaries in ID order
     - Select target King deterministically (highest wealth_exposed)
@@ -145,7 +145,7 @@
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [ ] 6. Implement economic calculation functions
-  - [ ] 6.1 Create `core/economics.py` with pure calculation functions
+  - [x] 6.1 Create `core/economics.py` with pure calculation functions
     - Implement `wealth_total(agent)` to sum all traits
     - Implement `wealth_exposed(agent, config)` with exposure factors
     - Implement `king_defend_projection(king, knights, attackers, config)`
@@ -154,14 +154,14 @@
     - Implement `clamp(value, min, max)` helper function
     - _Requirements: 4.5, 8.1, 8.2_
 
-  - [ ] 6.2 Implement bribe resolution logic
+  - [x] 6.2 Implement bribe resolution logic
     - Create `resolve_bribe(king, merc, knights, config)` function
     - Compute raid_value
     - Check threshold >= raid_value AND currency >= threshold
     - Return BribeOutcome with transfers and leakage
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ] 6.3 Implement defend resolution logic
+  - [x] 6.3 Implement defend resolution logic
     - Create `p_knight_win(knight, merc, config)` function
     - Compute trait delta and sigmoid transformation
     - Apply clamp to [0.05, 0.95]
@@ -170,7 +170,7 @@
     - Return DefendOutcome with winner and transfers
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 6.4 Implement wealth and currency transfer functions
+  - [x] 6.4 Implement wealth and currency transfer functions
     - Create `apply_bribe_outcome(king, merc, outcome)` function
     - Create `apply_wealth_leakage(king, leakage_frac)` function
     - Create `apply_mirrored_losses(king, merc, config)` function
@@ -178,8 +178,8 @@
     - Ensure all transfers maintain non-negative invariants
     - _Requirements: 3.5, 4.3, 5.4, 5.5_
 
-- [ ] 7. Implement Policy DSL Compiler
-  - [ ] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
+- [-] 7. Implement Policy DSL Compiler
+  - [-] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
     - Implement `__init__` to accept YAML config
     - Implement `compile()` to generate CompiledPolicies
     - Implement `validate()` to check policy syntax
