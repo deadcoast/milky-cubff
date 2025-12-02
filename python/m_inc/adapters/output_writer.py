@@ -7,9 +7,56 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
+# Optional numpy import for handling numpy types if present
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    np = None
+
 from ..core.models import TickResult, Event, Agent
 from ..core.config import OutputConfig
 from ..core.schemas import validate_tick_result
+
+
+class MIncJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder for M|inc data types.
+    
+    Handles:
+    - numpy types (int64, float64, etc.) if numpy is available
+    - datetime objects
+    - Enums
+    - Custom objects with to_dict() method
+    """
+    
+    def default(self, obj):
+        """Convert non-serializable objects to JSON-compatible types."""
+        # Handle numpy types if numpy is available
+        if HAS_NUMPY and np is not None:
+            if isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+                return int(obj)
+            elif isinstance(obj, (np.floating, np.float64, np.float32, np.float16)):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, np.bool_):
+                return bool(obj)
+        
+        # Handle datetime objects
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        
+        # Handle enums
+        if hasattr(obj, 'value'):
+            return obj.value
+        
+        # Handle objects with to_dict method
+        if hasattr(obj, 'to_dict'):
+            return obj.to_dict()
+        
+        # Fall back to default behavior
+        return super().default(obj)
 
 
 class OutputWriter:
@@ -55,6 +102,9 @@ class OutputWriter:
     
     def write_tick_json(self, tick_result: TickResult) -> None:
         """Write a tick result to JSON.
+        
+        Accumulates tick results for batch writing. Call flush_ticks() or
+        use context manager to write to disk.
         
         Args:
             tick_result: Tick result to write
@@ -138,26 +188,47 @@ class OutputWriter:
                 writer.writerow(row)
     
     def flush_ticks(self) -> None:
-        """Flush accumulated tick results to JSON file."""
+        """Flush accumulated tick results to JSON file.
+        
+        Serializes TickResult objects to JSON with:
+        - Proper formatting (2-space indentation)
+        - Metadata included in first tick
+        - Custom encoder for numpy types and custom objects
+        - Optional gzip compression
+        """
         if not self.config.json_ticks or not self._tick_results:
             return
         
         # Convert to dict format
         ticks_data = []
-        for tick_result in self._tick_results:
+        for i, tick_result in enumerate(self._tick_results):
             tick_dict = tick_result.to_dict()
-            # Add metadata to first tick
-            if len(ticks_data) == 0:
-                tick_dict["meta"] = self.metadata
+            
+            # Add metadata to first tick only
+            if i == 0 and self.metadata:
+                tick_dict["meta"] = self.metadata.copy()
+            
             ticks_data.append(tick_dict)
         
-        # Write to file
+        # Write to file with custom encoder
         if self.config.compress:
             with gzip.open(self.ticks_path, 'wt', encoding='utf-8') as f:
-                json.dump(ticks_data, f, indent=2)
+                json.dump(
+                    ticks_data, 
+                    f, 
+                    indent=2, 
+                    cls=MIncJSONEncoder,
+                    ensure_ascii=False
+                )
         else:
             with open(self.ticks_path, 'w', encoding='utf-8') as f:
-                json.dump(ticks_data, f, indent=2)
+                json.dump(
+                    ticks_data, 
+                    f, 
+                    indent=2, 
+                    cls=MIncJSONEncoder,
+                    ensure_ascii=False
+                )
         
         # Clear accumulator
         self._tick_results.clear()
@@ -223,11 +294,14 @@ class StreamingOutputWriter(OutputWriter):
     """Output writer that writes immediately without accumulation.
     
     Useful for long-running simulations where you want to see results
-    as they happen.
+    as they happen. Writes each tick as a JSON line (JSONL format).
     """
     
     def write_tick_json(self, tick_result: TickResult) -> None:
         """Write a tick result immediately to JSON.
+        
+        Writes to JSONL format (one JSON object per line) for streaming.
+        Uses custom encoder to handle numpy types and custom objects.
         
         Args:
             tick_result: Tick result to write
@@ -238,11 +312,14 @@ class StreamingOutputWriter(OutputWriter):
         # Convert to dict
         tick_dict = tick_result.to_dict()
         
-        # For streaming, we write each tick as a JSON line
+        # Add metadata to first tick
         ticks_jsonl_path = self.output_dir / "ticks.jsonl"
+        if not ticks_jsonl_path.exists() and self.metadata:
+            tick_dict["meta"] = self.metadata.copy()
         
+        # For streaming, we write each tick as a JSON line
         with open(ticks_jsonl_path, 'a', encoding='utf-8') as f:
-            json.dump(tick_dict, f)
+            json.dump(tick_dict, f, cls=MIncJSONEncoder, ensure_ascii=False)
             f.write('\n')
     
     def flush_ticks(self) -> None:

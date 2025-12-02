@@ -376,7 +376,7 @@
 
 - [x] 11. Implement Output Writer
 
-  - [ ] 11.1 Create `adapters/output_writer.py` with OutputWriter class
+  - [x] 11.1 Create `adapters/output_writer.py` with OutputWriter class
     - Implement `__init__` with output directory and OutputConfig
     - Implement `write_tick_json(tick_result)` for JSON snapshots
     - Implement `write_event_csv(events)` for event log
