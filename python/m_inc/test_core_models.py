@@ -239,6 +239,134 @@ def test_schema_validation_negative_currency():
         pass  # Expected
 
 
+def test_event_serialization():
+    """Test Event to_dict and from_dict."""
+    event = Event(
+        tick=5,
+        type=EventType.TRADE,
+        king="K-01",
+        amount=100,
+        notes="trade executed"
+    )
+    
+    event_dict = event.to_dict()
+    assert event_dict["tick"] == 5
+    assert event_dict["type"] == "trade"
+    assert event_dict["king"] == "K-01"
+    assert event_dict["amount"] == 100
+    
+    # Reconstruct from dict
+    event_restored = Event.from_dict(event_dict)
+    assert event_restored.tick == event.tick
+    assert event_restored.type == event.type
+    assert event_restored.king == event.king
+    assert event_restored.amount == event.amount
+
+
+def test_wealth_traits_boundary_values():
+    """Test WealthTraits with boundary values."""
+    # Test with zero values
+    wealth_zero = WealthTraits(compute=0, copy=0, defend=0, raid=0, trade=0, sense=0, adapt=0)
+    assert wealth_zero.total() == 0
+    
+    # Test with large values
+    wealth_large = WealthTraits(compute=1000, copy=2000, defend=3000, raid=4000, trade=5000, sense=6000, adapt=7000)
+    assert wealth_large.total() == 28000
+    
+    # Test scaling to zero
+    wealth_large.scale(0.0)
+    assert wealth_large.total() == 0
+
+
+def test_agent_wealth_total_method():
+    """Test Agent.wealth_total() method."""
+    wealth = WealthTraits(compute=10, copy=20, defend=30, raid=40, trade=50, sense=60, adapt=70)
+    agent = Agent(
+        id="K-01",
+        tape_id=0,
+        role=Role.KING,
+        currency=5000,
+        wealth=wealth
+    )
+    
+    assert agent.wealth_total() == 280
+    
+    # Modify wealth and verify
+    agent.wealth.add("compute", 10)
+    assert agent.wealth_total() == 290
+
+
+def test_tick_result_creation():
+    """Test TickResult creation and structure."""
+    metrics = TickMetrics(
+        entropy=5.5,
+        compression_ratio=2.5,
+        copy_score_mean=0.5,
+        wealth_total=1000,
+        currency_total=50000,
+        bribes_paid=5,
+        bribes_accepted=3,
+        raids_attempted=10
+    )
+    
+    agent_snapshot = AgentSnapshot(
+        id="K-01",
+        role="king",
+        currency=5000,
+        wealth={"compute": 10, "copy": 15, "defend": 20, "raid": 5, "trade": 12, "sense": 8, "adapt": 6}
+    )
+    
+    events = [
+        Event(tick=1, type=EventType.TRADE, king="K-01", amount=100)
+    ]
+    
+    result = TickResult(
+        tick_num=1,
+        events=events,
+        metrics=metrics,
+        agent_snapshots=[agent_snapshot]
+    )
+    
+    assert result.tick_num == 1
+    assert len(result.events) == 1
+    assert result.metrics.wealth_total == 1000
+    assert len(result.agent_snapshots) == 1
+
+
+def test_agent_snapshot_from_agent():
+    """Test creating AgentSnapshot from Agent."""
+    wealth = WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=12, sense=8, adapt=6)
+    agent = Agent(
+        id="K-01",
+        tape_id=0,
+        role=Role.KING,
+        currency=5000,
+        wealth=wealth
+    )
+    
+    snapshot = AgentSnapshot.from_agent(agent)
+    
+    assert snapshot.id == "K-01"
+    assert snapshot.role == "king"
+    assert snapshot.currency == 5000
+    assert snapshot.wealth["compute"] == 10
+
+
+def test_role_enum():
+    """Test Role enum values."""
+    assert Role.KING.value == "king"
+    assert Role.KNIGHT.value == "knight"
+    assert Role.MERCENARY.value == "mercenary"
+
+
+def test_event_type_enum():
+    """Test EventType enum values."""
+    assert EventType.TRADE.value == "trade"
+    assert EventType.BRIBE_ACCEPT.value == "bribe_accept"
+    assert EventType.DEFEND_WIN.value == "defend_win"
+    assert EventType.DEFEND_LOSS.value == "defend_loss"
+
+
 if __name__ == "__main__":
     # Run all tests
     tests = [
@@ -257,6 +385,13 @@ if __name__ == "__main__":
         test_config_validation,
         test_schema_validation,
         test_schema_validation_negative_currency,
+        test_event_serialization,
+        test_wealth_traits_boundary_values,
+        test_agent_wealth_total_method,
+        test_tick_result_creation,
+        test_agent_snapshot_from_agent,
+        test_role_enum,
+        test_event_type_enum,
     ]
     
     print("Running core models tests...")

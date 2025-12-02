@@ -46,6 +46,128 @@ minc --trace testdata/bff_trace.json \
 ./bin/main --lang bff_noheads | minc --stream --config config.yaml
 ```
 
+## BFF Integration
+
+M|inc integrates seamlessly with existing BFF tools through adapters and wrapper scripts.
+
+### Using the Wrapper Script
+
+The `run_minc_on_bff.py` wrapper provides three modes of operation:
+
+#### 1. Run BFF simulation and analyze
+
+```bash
+python ../run_minc_on_bff.py \
+  --bff-program ../../testdata/bff.txt \
+  --config config/minc_default.yaml \
+  --output output/ \
+  --ticks 100
+```
+
+This will:
+1. Run the BFF program using `save_bff_trace.py`
+2. Convert the binary trace to JSON format
+3. Process with M|inc economic engine
+4. Generate output files
+
+#### 2. Analyze existing BFF trace
+
+```bash
+python ../run_minc_on_bff.py \
+  --bff-trace path/to/trace.bin \
+  --config config/minc_default.yaml \
+  --output output/ \
+  --ticks 100
+```
+
+#### 3. Convert BFF trace to JSON
+
+```bash
+python ../run_minc_on_bff.py \
+  --convert path/to/trace.bin \
+  --output trace.json
+```
+
+### BFF Bridge Adapter
+
+The BFF bridge adapter (`adapters/bff_bridge.py`) handles conversion between BFF binary format and M|inc EpochData:
+
+```python
+from m_inc.adapters.bff_bridge import BFFBridge, stream_bff_to_minc
+
+# Read BFF trace and convert to epochs
+with BFFBridge("trace.bin") as bridge:
+    for epoch in bridge.read_all_states_as_epochs():
+        print(f"Epoch {epoch.epoch_num}: {len(epoch.tapes)} tapes")
+
+# Stream BFF data for processing
+for epoch in stream_bff_to_minc("trace.bin"):
+    # Process epoch with M|inc
+    pass
+```
+
+### Trace Format
+
+BFF binary traces use the format produced by `save_bff_trace.py`:
+
+```
+Header:
+- 4 bytes: Magic number ('BFF\0')
+- 4 bytes: Format version (1)
+- 4 bytes: Tape size (128)
+
+For each state:
+- 4 bytes: Program counter
+- 4 bytes: Head 0 position
+- 4 bytes: Head 1 position
+- 128 bytes: Tape contents
+```
+
+The bridge splits each 128-byte tape into two 64-byte tapes for M|inc processing.
+
+### Integration Workflow
+
+```
+┌─────────────────┐
+│ BFF Simulation  │
+│   (main.cc)     │
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│save_bff_trace.py│
+│  (binary trace) │
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│   BFF Bridge    │
+│  (conversion)   │
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│  M|inc Engine   │
+│  (economics)    │
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│ Output Files    │
+│ (JSON/CSV)      │
+└─────────────────┘
+```
+
+### Standalone Converter
+
+For simple trace conversion without M|inc dependencies:
+
+```bash
+python ../convert_bff_trace.py input.bin output.json [num_states]
+```
+
+This standalone script converts BFF binary traces to JSON format without requiring the M|inc package to be installed.
+
 ### Python API
 
 ```python

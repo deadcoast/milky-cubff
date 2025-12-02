@@ -50,7 +50,7 @@ def main():
     
     # Initialize engine
     print(f"\n4. Initializing economic engine...")
-    engine = EconomicEngine(registry, config.economic)
+    engine = EconomicEngine(registry, config.economic, config.trait_emergence)
     print(f"   ✓ Engine ready")
     
     # Initialize output writer

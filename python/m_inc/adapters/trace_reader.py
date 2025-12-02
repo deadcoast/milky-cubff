@@ -64,7 +64,9 @@ class TraceReader:
         self._is_stream = source is None
         self._format = None
         
-        if self.source and self.source.exists():
+        if self._is_stream:
+            self._format = "stream"
+        elif self.source and self.source.exists():
             self._detect_format()
     
     def _detect_format(self) -> None:

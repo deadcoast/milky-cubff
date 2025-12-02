@@ -297,8 +297,8 @@
     - Support append mode for streaming writes
     - _Requirements: 10.2, 10.3_
 
-- [ ] 12. Implement CLI interface
-  - [ ] 12.1 Create `cli.py` with main entry point
+- [x] 12. Implement CLI interface
+  - [x] 12.1 Create `cli.py` with main entry point
     - Parse command-line arguments (trace, config, output, ticks)
     - Load configuration from YAML
     - Initialize all components (registry, engine, writer)
@@ -306,20 +306,20 @@
     - Handle errors and logging
     - _Requirements: 1.5, 15.2, 15.5_
 
-  - [ ] 12.2 Add streaming mode support
+  - [x] 12.2 Add streaming mode support
     - Accept stdin as trace source
     - Process ticks incrementally
     - Write outputs in real-time
     - _Requirements: 15.2_
 
-  - [ ] 12.3 Add batch processing mode
+  - [x] 12.3 Add batch processing mode
     - Process multiple trace files in parallel
     - Aggregate results across runs
     - Generate summary reports
     - _Requirements: 15.3_
 
-- [ ] 13. Create configuration files and examples
-  - [ ] 13.1 Create `config/minc_default.yaml` with default parameters
+- [x] 13. Create configuration files and examples
+  - [x] 13.1 Create `config/minc_default.yaml` with default parameters
     - Set role ratios (10% Kings, 20% Knights, 70% Mercs)
     - Set economic parameters (raid weights, defend resolution, etc.)
     - Set refractory periods
@@ -327,39 +327,39 @@
     - Set output options
     - _Requirements: 11.1, 11.4_
 
-  - [ ] 13.2 Create `config/minc_fast.yaml` for quick experiments
+  - [x] 13.2 Create `config/minc_fast.yaml` for quick experiments
     - Disable caching for simplicity
     - Reduce refractory periods
     - Minimal output (JSON only)
     - _Requirements: 11.1_
 
-  - [ ] 13.3 Create example trace files in `testdata/`
+  - [x] 13.3 Create example trace files in `testdata/`
     - Create small 10-tick trace for testing
     - Create medium 100-tick trace for validation
     - Document trace format
     - _Requirements: 15.3_
 
-- [ ] 14. Implement integration with existing BFF tools
-  - [ ] 14.1 Create `adapters/bff_bridge.py` for BFF integration
+- [x] 14. Implement integration with existing BFF tools
+  - [x] 14.1 Create `adapters/bff_bridge.py` for BFF integration
     - Parse output from `save_bff_trace.py`
     - Convert BFF soup format to M|inc EpochData
     - Handle both file and stream inputs
     - _Requirements: 15.1, 15.2_
 
-  - [ ] 14.2 Create wrapper script `run_minc_on_bff.py`
+  - [x] 14.2 Create wrapper script `run_minc_on_bff.py`
     - Run BFF simulation with `main.cc`
     - Pipe output to M|inc CLI
     - Collect and display results
     - _Requirements: 15.2, 15.5_
 
-  - [ ] 14.3 Update existing tool documentation
+  - [x] 14.3 Update existing tool documentation
     - Add M|inc section to main README.md
     - Document integration points
     - Provide usage examples
     - _Requirements: 15.5_
 
-- [ ] 15. Write comprehensive tests
-  - [ ] 15.1 Create unit tests for economic functions
+- [x] 15. Write comprehensive tests
+  - [x] 15.1 Create unit tests for economic functions
     - Test `raid_value` with various agent configurations
     - Test `p_knight_win` with edge cases
     - Test `resolve_bribe` outcomes
@@ -367,21 +367,21 @@
     - Test wealth/currency transfer functions
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 15.2 Create unit tests for data models
+  - [x] 15.2 Create unit tests for data models
     - Test Agent validation and methods
     - Test WealthTraits operations
     - Test Event serialization
     - Test schema validation
     - _Requirements: 3.1, 3.2, 3.3, 3.5_
 
-  - [ ] 15.3 Create integration tests for components
+  - [x] 15.3 Create integration tests for components
     - Test TraceReader → AgentRegistry flow
     - Test EconomicEngine → EventAggregator flow
     - Test CacheLayer integration
     - Test SignalProcessor integration
     - _Requirements: 12.1, 12.2, 12.3, 13.1, 13.2_
 
-  - [ ] 15.4 Create end-to-end tests
+  - [x] 15.4 Create end-to-end tests
     - Test full pipeline from trace to outputs
     - Test determinism (same seed → same results)
     - Test schema validation for all outputs

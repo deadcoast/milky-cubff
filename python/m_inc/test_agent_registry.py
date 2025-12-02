@@ -1,9 +1,9 @@
 """Tests for agent registry functionality."""
 
 import pytest
-from python.m_inc.core.agent_registry import AgentRegistry
-from python.m_inc.core.models import Role, Agent, WealthTraits
-from python.m_inc.core.config import RegistryConfig
+from core.agent_registry import AgentRegistry
+from core.models import Role, Agent, WealthTraits
+from core.config import RegistryConfig
 
 
 def test_agent_registry_initialization():
