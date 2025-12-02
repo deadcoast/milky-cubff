@@ -1,9 +1,9 @@
 """Economic engine for M|inc tick processing."""
 
-from typing import List, Optional
-from .models import Agent, Event, EventType, TickMetrics, TickResult, AgentSnapshot
+from typing import List
+from .models import Agent, Event, EventType, TickMetrics, TickResult, AgentSnapshot, Role
 from .agent_registry import AgentRegistry
-from .config import EconomicConfig
+from .config import EconomicConfig, TraitEmergenceConfig
 from . import economics
 
 
@@ -14,52 +14,49 @@ class EconomicEngine:
     1. Soup drip (trait emergence)
     2. Trade operations
     3. Retainer payments
-    4. Interactions (bribes, raids, defends)
-    5. Metrics computation
+    4. Raid/defend interactions
+    
+    All operations are deterministic given the same initial state.
     """
     
-    def __init__(self, registry: AgentRegistry, config: EconomicConfig):
+    def __init__(self, registry: AgentRegistry, config: EconomicConfig,
+                 trait_config: TraitEmergenceConfig):
         """Initialize economic engine.
         
         Args:
-            registry: Agent registry
-            config: Economic configuration
+            registry: Agent registry managing all agents
+            config: Economic configuration parameters
+            trait_config: Trait emergence configuration
         """
         self.registry = registry
         self.config = config
-        self.current_tick = 0
+        self.trait_config = trait_config
     
     def process_tick(self, tick_num: int) -> TickResult:
-        """Process a single economic tick.
+        """Process a complete economic tick.
+        
+        Executes the tick sequence:
+        1. Soup drip (trait emergence)
+        2. Trade operations
+        3. Retainer payments
+        4. Raid/defend interactions
         
         Args:
-            tick_num: Tick number
+            tick_num: Current tick number (1-indexed)
             
         Returns:
             TickResult with events, metrics, and agent snapshots
         """
-        self.current_tick = tick_num
         events: List[Event] = []
         
-        # 1. Soup drip (trait emergence)
-        events.extend(self._soup_drip())
+        # Execute tick sequence
+        events.extend(self._soup_drip(tick_num))
+        events.extend(self._execute_trades(tick_num))
+        events.extend(self._pay_retainers(tick_num))
+        events.extend(self._execute_interactions(tick_num))
         
-        # 2. Trade operations
-        events.extend(self._execute_trades())
-        
-        # 3. Retainer payments
-        events.extend(self._pay_retainers())
-        
-        # 4. Interactions (bribes, raids, defends)
-        events.extend(self._execute_interactions())
-        
-        # 5. Clamp non-negative values
-        self._clamp_nonnegative()
-        
-        # 6. Compute metrics
-        metrics = self._compute_metrics(events)
-        
-        # 7. Snapshot agents
+        # Compute metrics and snapshots
+        metrics = self._compute_metrics()
         snapshots = self._snapshot_agents()
         
         return TickResult(
@@ -69,263 +66,378 @@ class EconomicEngine:
             agent_snapshots=snapshots
         )
     
-    def _soup_drip(self) -> List[Event]:
-        """Apply soup drip (trait emergence from BFF activity).
+    def _soup_drip(self, tick_num: int) -> List[Event]:
+        """Apply trait emergence (soup drip) rules.
         
+        Checks trait emergence conditions and applies deltas.
+        Default rule: if copy >= 12 and tick is even, increment copy by 1.
+        
+        Args:
+            tick_num: Current tick number
+            
         Returns:
             List of trait_drip events
         """
-        events = []
+        events: List[Event] = []
         
-        for agent in self.registry.get_all_agents():
-            # Rule: if copy >= 12 and tick % 2 == 0, add +1 copy
-            if agent.wealth.copy >= 12 and self.current_tick % 2 == 0:
-                agent.add_wealth("copy", 1)
-                self.registry.update_agent(agent)
+        if not self.trait_config.enabled:
+            return events
+        
+        for rule in self.trait_config.rules:
+            condition = rule.get("condition", "")
+            delta = rule.get("delta", {})
+            
+            # Parse and evaluate condition for each agent
+            for agent in self.registry.get_all_agents():
+                # Build evaluation context
+                context = {
+                    "copy": agent.wealth.copy,
+                    "compute": agent.wealth.compute,
+                    "defend": agent.wealth.defend,
+                    "raid": agent.wealth.raid,
+                    "trade": agent.wealth.trade,
+                    "sense": agent.wealth.sense,
+                    "adapt": agent.wealth.adapt,
+                    "tick": tick_num,
+                    "currency": agent.currency
+                }
                 
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.TRAIT_DRIP,
-                    agent=agent.id,
-                    trait="copy",
-                    delta=1
-                ))
+                # Evaluate condition
+                try:
+                    # Allow basic Python operators in eval
+                    safe_builtins = {
+                        "__builtins__": {},
+                        "True": True,
+                        "False": False,
+                        "None": None
+                    }
+                    if eval(condition, safe_builtins, context):
+                        # Apply delta
+                        for trait_name, amount in delta.items():
+                            agent.add_wealth(trait_name, amount)
+                            
+                            # Record event
+                            events.append(Event(
+                                tick=tick_num,
+                                type=EventType.TRAIT_DRIP,
+                                agent=agent.id,
+                                trait=trait_name,
+                                delta=amount,
+                                notes=f"drip: {trait_name}+{amount}"
+                            ))
+                        
+                        # Update agent in registry
+                        self.registry.update_agent(agent)
+                except Exception:
+                    # Skip invalid conditions
+                    pass
         
         return events
     
-    def _execute_trades(self) -> List[Event]:
-        """Execute trade operations for all kings.
+    def _execute_trades(self, tick_num: int) -> List[Event]:
+        """Execute trade operations for kings.
         
+        Each king can invest 100 currency to create 5 wealth units
+        (3 defend, 2 trade) if they have sufficient funds.
+        
+        Args:
+            tick_num: Current tick number
+            
         Returns:
             List of trade events
         """
-        events = []
+        events: List[Event] = []
         
-        for king in self.registry.get_kings():
-            wealth_created = economics.apply_trade(king, self.config)
-            
-            if wealth_created > 0:
-                self.registry.update_agent(king)
+        kings = self.registry.get_kings()
+        invest_amount = self.config.trade["invest_per_tick"]
+        
+        for king in kings:
+            if king.currency >= invest_amount:
+                # Apply trade
+                wealth_created = economics.apply_trade(king, self.config)
                 
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.TRADE,
-                    king=king.id,
-                    invest=self.config.trade["invest_per_tick"],
-                    wealth_created=wealth_created
-                ))
+                if wealth_created > 0:
+                    # Record event
+                    events.append(Event(
+                        tick=tick_num,
+                        type=EventType.TRADE,
+                        king=king.id,
+                        invest=invest_amount,
+                        wealth_created=wealth_created,
+                        notes=f"invested {invest_amount}, created {wealth_created} wealth"
+                    ))
+                    
+                    # Update agent in registry
+                    self.registry.update_agent(king)
         
         return events
     
-    def _pay_retainers(self) -> List[Event]:
-        """Pay retainers from kings to employed knights.
+    def _pay_retainers(self, tick_num: int) -> List[Event]:
+        """Pay retainer fees from kings to employed knights.
         
+        For each knight with an employer, attempt to transfer the
+        retainer fee from the employer king to the knight.
+        
+        Args:
+            tick_num: Current tick number
+            
         Returns:
             List of retainer events
         """
-        events = []
+        events: List[Event] = []
         
-        for knight in self.registry.get_knights():
-            if not knight.employer:
-                continue
-            
-            king = self.registry.get_agent(knight.employer)
-            if not king:
-                continue
-            
-            if king.currency >= knight.retainer_fee:
-                # Transfer retainer
-                king.add_currency(-knight.retainer_fee)
-                knight.add_currency(knight.retainer_fee)
-                
-                self.registry.update_agent(king)
-                self.registry.update_agent(knight)
-                
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.RETAINER,
-                    employer=king.id,
-                    knight=knight.id,
-                    amount=knight.retainer_fee
-                ))
+        knights = self.registry.get_knights()
         
-        return events
-    
-    def _execute_interactions(self) -> List[Event]:
-        """Execute interactions between mercenaries and kings.
-        
-        Returns:
-            List of interaction events (bribes, defends, raids)
-        """
-        events = []
-        
-        # Get all mercenaries in ID order (deterministic)
-        mercenaries = sorted(self.registry.get_mercenaries(), key=lambda m: m.id)
-        
-        for merc in mercenaries:
-            if not merc.alive:
-                continue
-            
-            # Pick target king (highest exposed wealth)
-            kings = [k for k in self.registry.get_kings() if k.alive]
-            if not kings:
-                break
-            
-            king = economics.pick_target_king(kings, self.config)
-            
-            # Get assigned knights (employer first, then strongest free)
-            assigned_knights = self._get_assigned_knights(king)
-            
-            # Compute raid value
-            rv = economics.raid_value(merc, king, assigned_knights, self.config)
-            
-            # Bribe check
-            bribe_threshold = king.bribe_threshold
-            
-            if bribe_threshold >= rv and king.currency >= bribe_threshold:
-                # Successful bribe
-                king.add_currency(-bribe_threshold)
-                merc.add_currency(bribe_threshold)
-                economics.apply_bribe_leakage(king, self.config.bribe_leakage)
+        for knight in knights:
+            if knight.employer:
+                king = self.registry.get_agent(knight.employer)
                 
-                self.registry.update_agent(king)
-                self.registry.update_agent(merc)
-                
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.BRIBE_ACCEPT,
-                    king=king.id,
-                    merc=merc.id,
-                    amount=bribe_threshold,
-                    rv=round(rv, 2),
-                    notes="success"
-                ))
-                continue
-            
-            elif bribe_threshold >= rv:
-                # Insufficient funds
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.BRIBE_INSUFFICIENT,
-                    king=king.id,
-                    merc=merc.id,
-                    threshold=bribe_threshold
-                ))
-                # Fall through to contest
-            
-            # Contest (raid vs defend)
-            if not assigned_knights:
-                # Unopposed raid
-                economics.apply_mirrored_losses(king, merc, self.config)
-                
-                self.registry.update_agent(king)
-                self.registry.update_agent(merc)
-                
-                events.append(Event(
-                    tick=self.current_tick,
-                    type=EventType.UNOPPOSED_RAID,
-                    king=king.id,
-                    merc=merc.id
-                ))
-            else:
-                # Defended raid
-                knight = assigned_knights[0]  # One defender per attacker
-                
-                # Compute win probability
-                p_knight = economics.p_knight_win(knight, merc, self.config)
-                
-                # Compute stake
-                stake = economics.stake_amount(knight, merc, self.config)
-                
-                # Resolve outcome
-                knight_wins = economics.resolve_knight_wins(p_knight, knight.id, merc.id)
-                
-                if knight_wins:
-                    # Knight wins
-                    knight.add_currency(stake)
-                    merc.add_currency(-stake)
-                    economics.apply_bounty(knight, merc, bounty_frac=0.07)
+                if king and king.currency >= knight.retainer_fee:
+                    # Transfer retainer
+                    king.add_currency(-knight.retainer_fee)
+                    knight.add_currency(knight.retainer_fee)
                     
-                    self.registry.update_agent(knight)
-                    self.registry.update_agent(merc)
-                    
+                    # Record event
                     events.append(Event(
-                        tick=self.current_tick,
-                        type=EventType.DEFEND_WIN,
+                        tick=tick_num,
+                        type=EventType.RETAINER,
                         king=king.id,
                         knight=knight.id,
-                        merc=merc.id,
-                        stake=stake,
-                        p_knight=round(p_knight, 3)
+                        employer=king.id,
+                        amount=knight.retainer_fee,
+                        notes=f"retainer payment: {knight.retainer_fee}"
                     ))
-                else:
-                    # Mercenary wins
-                    economics.apply_mirrored_losses(king, merc, self.config)
-                    knight.add_currency(-stake)
-                    if knight.wealth.defend > 0:
-                        knight.add_wealth("defend", -1)
                     
+                    # Update agents in registry
                     self.registry.update_agent(king)
                     self.registry.update_agent(knight)
-                    self.registry.update_agent(merc)
-                    
-                    events.append(Event(
-                        tick=self.current_tick,
-                        type=EventType.DEFEND_LOSS,
-                        king=king.id,
-                        knight=knight.id,
-                        merc=merc.id,
-                        stake=stake,
-                        p_knight=round(p_knight, 3)
-                    ))
         
         return events
     
-    def _get_assigned_knights(self, king: Agent) -> List[Agent]:
-        """Get knights assigned to defend a king.
+    def _execute_interactions(self, tick_num: int) -> List[Event]:
+        """Execute raid/defend interactions.
         
-        Priority: employer knights first, then strongest free knights.
+        For each mercenary (in ID order):
+        1. Select target king (highest exposed wealth)
+        2. Assign defending knights (employer first, then strongest free)
+        3. Evaluate bribe
+        4. If bribe fails, resolve defend contest
         
         Args:
-            king: King to get defenders for
+            tick_num: Current tick number
             
         Returns:
-            List of assigned knights (currently max 1)
+            List of interaction events (bribe, defend, raid)
         """
-        # Get employed knights
-        employed = self.registry.get_employed_knights(king.id)
+        events: List[Event] = []
         
-        # Get free knights sorted by defend (descending)
-        free = sorted(
-            self.registry.get_free_knights(),
-            key=lambda k: (-k.wealth.defend, k.id)
-        )
+        mercenaries = sorted(self.registry.get_mercenaries(), key=lambda m: m.id)
+        kings = self.registry.get_kings()
         
-        # Return employed first, then free (limit to 1 for now)
-        all_knights = employed + free
-        return all_knights[:1] if all_knights else []
-    
-    def _clamp_nonnegative(self) -> None:
-        """Ensure all currency and wealth values are non-negative."""
-        for agent in self.registry.get_all_agents():
-            # Clamp currency
-            if agent.currency < 0:
-                agent.currency = 0
+        if not kings:
+            return events
+        
+        for merc in mercenaries:
+            # Select target king (highest exposed wealth)
+            target_king = economics.pick_target_king(kings, self.config)
             
-            # Clamp wealth traits
-            for trait_name in ["compute", "copy", "defend", "raid", "trade", "sense", "adapt"]:
-                trait_value = getattr(agent.wealth, trait_name)
-                if trait_value < 0:
-                    setattr(agent.wealth, trait_name, 0)
+            # Get defending knights
+            defending_knights = self._assign_defending_knights(target_king)
             
-            self.registry.update_agent(agent)
+            # Compute raid value
+            rv = economics.raid_value(merc, target_king, defending_knights, self.config)
+            
+            # Evaluate bribe
+            threshold = target_king.bribe_threshold
+            
+            if threshold >= rv and target_king.currency >= threshold:
+                # Bribe succeeds
+                target_king.add_currency(-threshold)
+                merc.add_currency(threshold)
+                
+                # Apply wealth leakage to king
+                economics.apply_bribe_leakage(target_king, self.config.bribe_leakage)
+                
+                # Record event
+                events.append(Event(
+                    tick=tick_num,
+                    type=EventType.BRIBE_ACCEPT,
+                    king=target_king.id,
+                    merc=merc.id,
+                    amount=threshold,
+                    rv=rv,
+                    notes="success"
+                ))
+                
+                # Update agents
+                self.registry.update_agent(target_king)
+                self.registry.update_agent(merc)
+                
+            elif threshold >= rv:
+                # Bribe would work but king lacks funds
+                events.append(Event(
+                    tick=tick_num,
+                    type=EventType.BRIBE_INSUFFICIENT,
+                    king=target_king.id,
+                    merc=merc.id,
+                    threshold=threshold,
+                    rv=rv,
+                    notes="insufficient funds"
+                ))
+                
+                # Proceed to raid/defend
+                events.extend(self._resolve_defend(tick_num, target_king, merc, defending_knights))
+                
+            else:
+                # Bribe threshold too low, proceed to raid/defend
+                events.extend(self._resolve_defend(tick_num, target_king, merc, defending_knights))
+        
+        return events
     
-    def _compute_metrics(self, events: List[Event]) -> TickMetrics:
-        """Compute metrics for the current tick.
+    def _assign_defending_knights(self, king: Agent) -> List[Agent]:
+        """Assign knights to defend a king.
+        
+        Priority:
+        1. Employed knights (knights with this king as employer)
+        2. Free knights (strongest by defend + sense + adapt)
         
         Args:
-            events: Events that occurred this tick
+            king: King being defended
             
+        Returns:
+            List of defending knights (may be empty)
+        """
+        defending = []
+        
+        # Get employed knights
+        employed = self.registry.get_employed_knights(king.id)
+        defending.extend(employed)
+        
+        # Get free knights (not employed by anyone)
+        free_knights = self.registry.get_free_knights()
+        
+        # Sort free knights by defensive strength
+        free_knights_sorted = sorted(
+            free_knights,
+            key=lambda k: -(k.wealth.defend + k.wealth.sense + k.wealth.adapt)
+        )
+        
+        # Add strongest free knight if available
+        if free_knights_sorted:
+            defending.append(free_knights_sorted[0])
+        
+        return defending
+    
+    def _resolve_defend(self, tick_num: int, king: Agent, merc: Agent,
+                       knights: List[Agent]) -> List[Event]:
+        """Resolve a defend contest between knight(s) and mercenary.
+        
+        If no knights available, mercenary wins unopposed.
+        Otherwise, strongest knight defends and outcome is determined
+        by p_knight_win probability with deterministic tie-breaking.
+        
+        Args:
+            tick_num: Current tick number
+            king: King being raided
+            merc: Mercenary raiding
+            knights: List of defending knights
+            
+        Returns:
+            List of defend events
+        """
+        events: List[Event] = []
+        
+        if not knights:
+            # Unopposed raid - mercenary wins
+            economics.apply_mirrored_losses(king, merc, self.config)
+            
+            events.append(Event(
+                tick=tick_num,
+                type=EventType.UNOPPOSED_RAID,
+                king=king.id,
+                merc=merc.id,
+                notes="no defenders"
+            ))
+            
+            # Update agents
+            self.registry.update_agent(king)
+            self.registry.update_agent(merc)
+            
+            return events
+        
+        # Select defending knight (first in list, which is employer or strongest free)
+        knight = knights[0]
+        
+        # Compute win probability
+        p_knight = economics.p_knight_win(knight, merc, self.config)
+        
+        # Compute stake
+        stake = economics.stake_amount(knight, merc, self.config)
+        
+        # Resolve deterministically
+        knight_wins = economics.resolve_knight_wins(p_knight, knight.id, merc.id)
+        
+        if knight_wins:
+            # Knight wins
+            # Transfer stake from merc to knight
+            merc.add_currency(-stake)
+            knight.add_currency(stake)
+            
+            # Apply bounty (7% of merc's raid and adapt)
+            economics.apply_bounty(knight, merc, bounty_frac=0.07)
+            
+            events.append(Event(
+                tick=tick_num,
+                type=EventType.DEFEND_WIN,
+                king=king.id,
+                knight=knight.id,
+                merc=merc.id,
+                stake=stake,
+                p_knight=p_knight,
+                notes=f"knight wins (p={p_knight:.3f})"
+            ))
+            
+            # Update agents
+            self.registry.update_agent(knight)
+            self.registry.update_agent(merc)
+            
+        else:
+            # Mercenary wins
+            # Transfer stake from knight to merc
+            knight.add_currency(-stake)
+            merc.add_currency(stake)
+            
+            # Apply mirrored losses from king to merc
+            economics.apply_mirrored_losses(king, merc, self.config)
+            
+            events.append(Event(
+                tick=tick_num,
+                type=EventType.DEFEND_LOSS,
+                king=king.id,
+                knight=knight.id,
+                merc=merc.id,
+                stake=stake,
+                p_knight=p_knight,
+                notes=f"merc wins (p={p_knight:.3f})"
+            ))
+            
+            # Update agents
+            self.registry.update_agent(king)
+            self.registry.update_agent(knight)
+            self.registry.update_agent(merc)
+        
+        return events
+    
+    def _compute_metrics(self) -> TickMetrics:
+        """Compute tick-level metrics.
+        
+        Computes:
+        - Total wealth and currency
+        - Mean copy score
+        - Entropy (placeholder - requires BFF trace data)
+        - Compression ratio (placeholder - requires BFF trace data)
+        - Event counts (computed from events in process_tick)
+        
         Returns:
             TickMetrics with computed values
         """
@@ -335,45 +447,33 @@ class EconomicEngine:
         wealth_total = sum(agent.wealth_total() for agent in agents)
         currency_total = sum(agent.currency for agent in agents)
         
-        # Compute copy score mean
+        # Compute mean copy score
         copy_scores = [agent.wealth.copy for agent in agents]
         copy_score_mean = sum(copy_scores) / len(copy_scores) if copy_scores else 0.0
         
-        # Normalize copy score (divide by 20 for 0-1 range approximation)
-        copy_score_mean = copy_score_mean / 20.0
-        
-        # Compute entropy and compression (proxies for now)
-        # These would ideally come from BFF soup analysis
-        entropy = 6.2 - 0.24 * (self.current_tick * 0.05)
-        compression_ratio = 2.5 + (self.current_tick * 0.05)
-        
-        # Count event types
-        bribes_paid = sum(1 for e in events if e.type in [EventType.BRIBE_ACCEPT, EventType.BRIBE_INSUFFICIENT])
-        bribes_accepted = sum(1 for e in events if e.type == EventType.BRIBE_ACCEPT)
-        raids_attempted = sum(1 for e in events if e.type in [EventType.DEFEND_WIN, EventType.DEFEND_LOSS, EventType.UNOPPOSED_RAID])
-        raids_won_by_merc = sum(1 for e in events if e.type in [EventType.DEFEND_LOSS, EventType.UNOPPOSED_RAID])
-        raids_won_by_knight = sum(1 for e in events if e.type == EventType.DEFEND_WIN)
+        # Placeholder values for BFF-specific metrics
+        # These would be computed from BFF trace data in full integration
+        entropy = 0.0
+        compression_ratio = 0.0
         
         return TickMetrics(
-            entropy=max(0.0, entropy),
+            entropy=entropy,
             compression_ratio=compression_ratio,
             copy_score_mean=copy_score_mean,
             wealth_total=wealth_total,
             currency_total=currency_total,
-            bribes_paid=bribes_paid,
-            bribes_accepted=bribes_accepted,
-            raids_attempted=raids_attempted,
-            raids_won_by_merc=raids_won_by_merc,
-            raids_won_by_knight=raids_won_by_knight
+            bribes_paid=0,  # Will be updated by caller
+            bribes_accepted=0,  # Will be updated by caller
+            raids_attempted=0,  # Will be updated by caller
+            raids_won_by_merc=0,  # Will be updated by caller
+            raids_won_by_knight=0  # Will be updated by caller
         )
     
     def _snapshot_agents(self) -> List[AgentSnapshot]:
-        """Create snapshots of all agents.
+        """Capture current state of all agents.
         
         Returns:
-            List of agent snapshots
+            List of AgentSnapshot objects
         """
-        return [
-            AgentSnapshot.from_agent(agent)
-            for agent in self.registry.get_all_agents()
-        ]
+        agents = self.registry.get_all_agents()
+        return [AgentSnapshot.from_agent(agent) for agent in agents]

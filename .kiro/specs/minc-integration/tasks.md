@@ -74,8 +74,8 @@
 
 
 
-- [ ] 4. Implement Agent Registry component
-  - [ ] 4.1 Create `core/agent_registry.py` with AgentRegistry class
+- [x] 4. Implement Agent Registry component
+  - [x] 4.1 Create `core/agent_registry.py` with AgentRegistry class
     - Implement `__init__` with RegistryConfig
     - Implement `assign_roles()` to map tape IDs to roles based on ratios
     - Implement `get_agent()` for agent lookup by ID
@@ -84,7 +84,7 @@
     - Implement `update_agent()` to persist agent state changes
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 4.2 Add agent initialization logic
+  - [x] 4.2 Add agent initialization logic
     - Initialize currency based on role (Kings: 5000-7000, Knights: 100-300, Mercs: 0-50)
 
     - Initialize wealth traits based on role distributions
@@ -101,7 +101,7 @@
 
 - [x] 5. Implement Economic Engine core
 
-  - [ ] 5.1 Create `core/economic_engine.py` with EconomicEngine class
+  - [x] 5.1 Create `core/economic_engine.py` with EconomicEngine class
     - Implement `__init__` with AgentRegistry and EconomicConfig
     - Implement `process_tick()` orchestration method
     - Implement tick sequence: drip → trade → retainer → interactions
@@ -112,7 +112,7 @@
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 9.1, 9.2_
 
 
-  - [ ] 5.2 Implement soup drip logic
+  - [-] 5.2 Implement soup drip logic
     - Create `_soup_drip()` method
     - Check copy trait threshold (>= 12)
     - Apply +1 copy every 2 ticks
