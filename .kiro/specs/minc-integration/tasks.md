@@ -178,8 +178,8 @@
     - Ensure all transfers maintain non-negative invariants
     - _Requirements: 3.5, 4.3, 5.4, 5.5_
 
-- [-] 7. Implement Policy DSL Compiler
-  - [-] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
+- [x] 7. Implement Policy DSL Compiler
+  - [x] 7.1 Create `policies/policy_dsl.py` with PolicyCompiler class
     - Implement `__init__` to accept YAML config
     - Implement `compile()` to generate CompiledPolicies
     - Implement `validate()` to check policy syntax
@@ -187,7 +187,7 @@
     - Generate callable functions from YAML definitions
     - _Requirements: 11.1, 11.2, 11.4_
 
-  - [ ] 7.2 Add policy function generators
+  - [x] 7.2 Add policy function generators
     - Generate `bribe_outcome` callable from YAML
     - Generate `raid_value` callable from YAML
     - Generate `p_knight_win` callable from YAML
@@ -195,14 +195,14 @@
     - Ensure generated functions are pure (no side effects)
     - _Requirements: 8.1, 8.2_
 
-  - [ ]* 7.3 Add policy validation and testing
+  - [x] 7.3 Add policy validation and testing
     - Validate formula syntax before compilation
     - Test generated functions against known inputs
     - Verify determinism of compiled policies
     - _Requirements: 8.1, 8.2, 11.5_
 
-- [ ] 8. Implement Cache Layer
-  - [ ] 8.1 Create `core/cache.py` with CacheLayer class
+- [x] 8. Implement Cache Layer
+  - [x] 8.1 Create `core/cache.py` with CacheLayer class
     - Implement `__init__` with CacheConfig
     - Implement `get_or_compute(state, compute_fn)` with memoization
     - Implement `invalidate(reason)` to clear cache
@@ -210,7 +210,7 @@
     - Use LRU eviction policy with configurable max size
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [ ] 8.2 Implement canonical state computation
+  - [x] 8.2 Implement canonical state computation
     - Create `compute_canonical_state(agents)` function
     - Sort agents by ID for deterministic ordering
     - Extract relevant fields (role, currency, wealth)
@@ -229,7 +229,7 @@
 
 - [x] 9. Implement Signal Processor
 
-  - [ ] 9.1 Create `core/signals.py` with SignalProcessor class
+  - [x] 9.1 Create `core/signals.py` with SignalProcessor class
     - Implement `__init__` with SignalConfig
     - Implement `process_events(events)` to route to channels
     - Implement `update_refractory(tick_num)` to manage cooldowns
@@ -237,7 +237,7 @@
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
 
-  - [ ] 9.2 Add event queuing and coalescing
+  - [x] 9.2 Add event queuing and coalescing
     - Queue events that occur during refractory periods
     - Coalesce queued events when refractory expires
     - Apply priority-based scheduling
@@ -247,8 +247,8 @@
 
     - _Requirements: 13.3, 13.4_
 
-- [ ] 10. Implement Event Aggregator
-  - [ ] 10.1 Create `core/event_aggregator.py` with EventAggregator class
+- [x] 10. Implement Event Aggregator
+  - [x] 10.1 Create `core/event_aggregator.py` with EventAggregator class
     - Implement `__init__` to initialize aggregation state
     - Implement `add_event(event)` to collect events
 
@@ -259,7 +259,7 @@
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
 
-  - [ ] 10.2 Add metrics computation
+  - [x] 10.2 Add metrics computation
     - Compute entropy from agent wealth distribution
     - Compute compression ratio proxy
 
@@ -274,7 +274,7 @@
 
 - [x] 11. Implement Output Writer
 
-  - [ ] 11.1 Create `adapters/output_writer.py` with OutputWriter class
+  - [x] 11.1 Create `adapters/output_writer.py` with OutputWriter class
     - Implement `__init__` with output directory and OutputConfig
     - Implement `write_tick_json(tick_result)` for JSON snapshots
     - Implement `write_event_csv(events)` for event log

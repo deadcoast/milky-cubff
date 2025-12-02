@@ -175,6 +175,18 @@ class OutputWriter:
         try:
             if schema_name == "tick_result":
                 validate_tick_result(data)
+            elif schema_name == "agent":
+                from ..core.schemas import validate_agent
+                validate_agent(data)
+            elif schema_name == "event":
+                from ..core.schemas import validate_event
+                validate_event(data)
+            elif schema_name == "tick_metrics":
+                from ..core.schemas import TickMetricsSchema
+                TickMetricsSchema(**data)
+            elif schema_name == "agent_snapshot":
+                from ..core.schemas import AgentSnapshotSchema
+                AgentSnapshotSchema(**data)
             else:
                 # Unknown schema
                 return False
