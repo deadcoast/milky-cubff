@@ -3,15 +3,13 @@
 from .policy_dsl import (
     PolicyCompiler,
     CompiledPolicies,
-    PolicyError,
-    ValidationError,
-    CompilationError,
+    PolicyValidationError,
+    PolicyCompilationError,
 )
 
 __all__ = [
     "PolicyCompiler",
     "CompiledPolicies",
-    "PolicyError",
-    "ValidationError",
-    "CompilationError",
+    "PolicyValidationError",
+    "PolicyCompilationError",
 ]

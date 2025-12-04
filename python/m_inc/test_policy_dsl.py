@@ -1,775 +1,686 @@
 """Tests for Policy DSL Compiler."""
 
 import pytest
-from pathlib import Path
-from policies.policy_dsl import PolicyCompiler, ValidationError, CompilationError
-from core.models import Agent, Role, WealthTraits
-from core.config import EconomicConfig
+from m_inc.policies.policy_dsl import PolicyCompiler, PolicyValidationError, PolicyCompilationError, CompiledPolicies
+from m_inc.core.models import Agent, Role, WealthTraits
+from m_inc.core.config import EconomicConfig
 
 
-def test_policy_compiler_from_file():
-    """Test loading policy from YAML file."""
-    policy_file = Path("config/minc_default_policy.yaml")
-    
-    if not policy_file.exists():
-        pytest.skip("Policy file not found")
-    
-    compiler = PolicyCompiler.from_file(policy_file)
-    
-    assert compiler.name == "balanced_economy_v1"
-    assert compiler.version == "1.0.0"
-    assert 'employment_bonus' in compiler.parameters
-
-
-def test_policy_validation():
-    """Test policy validation."""
-    # Valid policy
-    valid_policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.raid * 1.0'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(valid_policy)
-    errors = compiler.validate()
-    assert len(errors) == 0
-    
-    # Invalid policy - missing functions
-    invalid_policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {}
-        }
-    }
-    
-    compiler = PolicyCompiler(invalid_policy)
-    errors = compiler.validate()
-    assert len(errors) > 0
-    assert any('raid_value' in err for err in errors)
-
-
-def test_policy_compilation():
-    """Test compiling a simple policy."""
-    policy = {
-        'policy': {
-            'name': 'test_policy',
-            'version': '1.0.0',
-            'functions': {
-                'raid_value': {
-                    'formula': 'merc.wealth.raid * 1.0',
-                },
-                'p_knight_win': {
-                    'formula': '0.5',
-                },
-                'bribe_outcome': {
-                    'conditions': [
-                        {'if': 'king.currency >= 100', 'result': 'accepted'},
-                        {'else': True, 'result': 'rejected'}
-                    ]
-                },
-                'trade_action': {
-                    'conditions': [
-                        {'if': 'king.currency >= invest_amount', 'result': 'success'},
-                        {'else': True, 'result': 'insufficient_funds'}
-                    ]
+@pytest.fixture
+def sample_policy_config():
+    """Sample policy configuration for testing."""
+    return {
+        'policies': {
+            'raid_value': {
+                'formula': 'alpha*merc.wealth.raid + beta*(merc.wealth.sense+merc.wealth.adapt) - gamma*king_defend + delta*king_exposed',
+                'params': {
+                    'alpha': 1.0,
+                    'beta': 0.25,
+                    'gamma': 0.60,
+                    'delta': 0.40
+                }
+            },
+            'bribe_outcome': {
+                'condition': 'threshold >= raid_value and king.currency >= threshold',
+                'on_success': {
+                    'king_currency': '-threshold',
+                    'merc_currency': '+threshold',
+                    'king_wealth_leakage': 0.05
+                }
+            },
+            'p_knight_win': {
+                'formula': 'clamp(base + (sigmoid(weight * trait_delta) - 0.5), clamp_min, clamp_max)',
+                'params': {
+                    'base': 0.5,
+                    'weight': 0.3,
+                    'employment_bonus': 0.25,
+                    'clamp_min': 0.05,
+                    'clamp_max': 0.95
+                }
+            },
+            'trade_action': {
+                'params': {
+                    'invest_per_tick': 100,
+                    'created_wealth_units': 5,
+                    'distribution': {'defend': 3, 'trade': 2}
                 }
             }
         }
     }
+
+
+@pytest.fixture
+def sample_agents():
+    """Create sample agents for testing."""
+    king = Agent(
+        id="K-01",
+        tape_id=1,
+        role=Role.KING,
+        currency=5000,
+        wealth=WealthTraits(compute=10, copy=12, defend=20, raid=2, trade=15, sense=5, adapt=7),
+        bribe_threshold=300
+    )
     
-    compiler = PolicyCompiler(policy)
+    knight = Agent(
+        id="N-01",
+        tape_id=2,
+        role=Role.KNIGHT,
+        currency=200,
+        wealth=WealthTraits(compute=3, copy=2, defend=15, raid=1, trade=0, sense=8, adapt=5),
+        employer="K-01"
+    )
+    
+    merc = Agent(
+        id="M-01",
+        tape_id=3,
+        role=Role.MERCENARY,
+        currency=50,
+        wealth=WealthTraits(compute=1, copy=3, defend=0, raid=12, trade=0, sense=6, adapt=4)
+    )
+    
+    return king, knight, merc
+
+
+def test_policy_compiler_initialization(sample_policy_config):
+    """Test PolicyCompiler initialization."""
+    compiler = PolicyCompiler(sample_policy_config)
+    assert compiler.config == sample_policy_config
+    assert 'raid_value' in compiler.policies
+
+
+def test_policy_validation_success(sample_policy_config):
+    """Test successful policy validation."""
+    compiler = PolicyCompiler(sample_policy_config)
+    errors = compiler.validate()
+    assert len(errors) == 0
+
+
+def test_policy_validation_missing_policy():
+    """Test validation fails when required policy is missing."""
+    config = {'policies': {'raid_value': {'formula': 'merc.raid'}}}
+    compiler = PolicyCompiler(config)
+    errors = compiler.validate()
+    assert len(errors) > 0
+    assert any('bribe_outcome' in err for err in errors)
+
+
+def test_policy_validation_invalid_syntax():
+    """Test validation fails with invalid formula syntax."""
+    config = {
+        'policies': {
+            'raid_value': {'formula': 'merc.raid +'},  # Invalid syntax
+            'bribe_outcome': {'condition': 'True'},
+            'p_knight_win': {'formula': '0.5'},
+            'trade_action': {'params': {}}
+        }
+    }
+    compiler = PolicyCompiler(config)
+    errors = compiler.validate()
+    assert len(errors) > 0
+
+
+def test_policy_compilation_success(sample_policy_config):
+    """Test successful policy compilation."""
+    compiler = PolicyCompiler(sample_policy_config)
     compiled = compiler.compile()
     
-    assert compiled.name == 'test_policy'
-    assert compiled.version == '1.0.0'
+    assert isinstance(compiled, CompiledPolicies)
     assert callable(compiled.raid_value)
-    assert callable(compiled.p_knight_win)
     assert callable(compiled.bribe_outcome)
+    assert callable(compiled.p_knight_win)
     assert callable(compiled.trade_action)
 
 
-def test_raid_value_function():
+def test_compiled_raid_value(sample_policy_config, sample_agents):
     """Test compiled raid_value function."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {
-                    'formula': 'merc.wealth.raid * 2.0',
-                },
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agents
-    merc = Agent(
-        id="M-01",
-        tape_id=1,
-        role=Role.MERCENARY,
-        currency=100,
-        wealth=WealthTraits(raid=10, sense=5, adapt=3)
-    )
-    
-    king = Agent(
-        id="K-01",
-        tape_id=2,
-        role=Role.KING,
-        currency=1000,
-        wealth=WealthTraits(defend=20)
-    )
-    
+    king, knight, merc = sample_agents
     config = EconomicConfig()
     
-    # Test raid value calculation
-    rv = compiled.raid_value(merc, king, [], config)
-    
-    # Should be merc.raid * 2.0 = 10 * 2.0 = 20.0
-    assert rv == 20.0
-
-
-def test_p_knight_win_function():
-    """Test compiled p_knight_win function."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': '0.0'},
-                'p_knight_win': {
-                    'formula': 'clamp(0.05, 0.95, 0.5 + sigmoid(0.3 * trait_delta) - 0.5)',
-                    'variables': {
-                        'trait_delta': '(knight.wealth.defend) - (merc.wealth.raid)'
-                    }
-                },
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
+    compiler = PolicyCompiler(sample_policy_config)
     compiled = compiler.compile()
     
-    # Create test agents
-    knight = Agent(
-        id="N-01",
-        tape_id=1,
-        role=Role.KNIGHT,
-        currency=200,
-        wealth=WealthTraits(defend=15)
-    )
+    rv = compiled.raid_value(merc, king, [knight], config)
     
-    merc = Agent(
-        id="M-01",
-        tape_id=2,
-        role=Role.MERCENARY,
-        currency=100,
-        wealth=WealthTraits(raid=10)
-    )
-    
-    config = EconomicConfig()
-    
-    # Test p_knight_win calculation
-    p = compiled.p_knight_win(knight, merc, config)
-    
-    # Should be clamped between 0.05 and 0.95
-    assert 0.05 <= p <= 0.95
+    assert isinstance(rv, float)
+    assert rv >= 0.0
 
 
-def test_bribe_outcome_function():
+def test_compiled_bribe_outcome(sample_policy_config, sample_agents):
     """Test compiled bribe_outcome function."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': '100.0'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {
-                    'conditions': [
-                        {
-                            'if': 'threshold >= raid_value and king.currency >= threshold',
-                            'then': {
-                                'king_currency': '-threshold',
-                                'merc_currency': '+threshold',
-                                'king_wealth_leakage': 0.05
-                            },
-                            'result': 'accepted'
-                        },
-                        {'else': True, 'result': 'rejected'}
-                    ]
-                },
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
+    king, knight, merc = sample_agents
+    config = EconomicConfig()
     
-    compiler = PolicyCompiler(policy)
+    compiler = PolicyCompiler(sample_policy_config)
     compiled = compiler.compile()
     
-    # Create test agents
-    king = Agent(
-        id="K-01",
-        tape_id=1,
-        role=Role.KING,
-        currency=1000,
-        wealth=WealthTraits(defend=20),
-        bribe_threshold=150
-    )
-    
-    merc = Agent(
-        id="M-01",
-        tape_id=2,
-        role=Role.MERCENARY,
-        currency=100,
-        wealth=WealthTraits(raid=10)
-    )
-    
-    config = EconomicConfig()
+    # Compute raid value first
+    rv = compiled.raid_value(merc, king, [knight], config)
     
     # Test bribe outcome
-    outcome = compiled.bribe_outcome(king, merc, [], config, compiled.raid_value)
+    outcome = compiled.bribe_outcome(king, merc, [knight], config, rv)
     
-    # Should be accepted since threshold (150) >= raid_value (100) and king has currency
-    assert outcome['accepted'] == True
-    assert outcome['amount'] == 150
+    assert hasattr(outcome, 'accepted')
+    assert isinstance(outcome.accepted, bool)
 
 
-def test_trade_action_function():
-    """Test compiled trade_action function."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': '0.0'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {
-                    'conditions': [
-                        {
-                            'if': 'king.currency >= invest_amount',
-                            'then': {
-                                'king_currency': '-invest_amount',
-                                'king_wealth': {'defend': 3, 'trade': 2}
-                            },
-                            'result': 'success'
-                        },
-                        {'else': True, 'result': 'insufficient_funds'}
-                    ]
-                }
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agent
-    king = Agent(
-        id="K-01",
-        tape_id=1,
-        role=Role.KING,
-        currency=1000,
-        wealth=WealthTraits(defend=20)
-    )
-    
+def test_compiled_p_knight_win(sample_policy_config, sample_agents):
+    """Test compiled p_knight_win function."""
+    king, knight, merc = sample_agents
     config = EconomicConfig()
     
-    # Test trade action
-    outcome = compiled.trade_action(king, config)
+    compiler = PolicyCompiler(sample_policy_config)
+    compiled = compiler.compile()
     
-    # Should succeed since king has enough currency
-    assert outcome['success'] == True
-    assert outcome['invest'] == 100
+    p = compiled.p_knight_win(knight, merc, config)
+    
+    assert isinstance(p, float)
+    assert 0.0 <= p <= 1.0
 
 
-def test_unsafe_operations_rejected():
-    """Test that unsafe operations are rejected during validation."""
-    # Policy with import statement
-    unsafe_policy = {
-        'policy': {
-            'name': 'unsafe',
-            'functions': {
-                'raid_value': {'formula': 'import os; os.system("ls")'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
+def test_compiled_trade_action(sample_policy_config, sample_agents):
+    """Test compiled trade_action function."""
+    king, knight, merc = sample_agents
+    config = EconomicConfig()
+    
+    initial_currency = king.currency
+    initial_defend = king.wealth.defend
+    
+    compiler = PolicyCompiler(sample_policy_config)
+    compiled = compiler.compile()
+    
+    created = compiled.trade_action(king, config)
+    
+    assert created == 5
+    assert king.currency == initial_currency - 100
+    assert king.wealth.defend == initial_defend + 3
+
+
+def test_formula_with_safe_functions(sample_agents):
+    """Test formula evaluation with safe functions."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'max(0, merc.wealth.raid - 5)',
+                'params': {}
+            },
+            'bribe_outcome': {'condition': 'True'},
+            'p_knight_win': {'formula': '0.5'},
+            'trade_action': {'params': {}}
         }
     }
     
-    compiler = PolicyCompiler(unsafe_policy)
-    errors = compiler.validate()
+    king, knight, merc = sample_agents
+    econ_config = EconomicConfig()
     
-    # Should have validation errors
-    assert len(errors) > 0
+    compiler = PolicyCompiler(config)
+    compiled = compiler.compile()
+    
+    rv = compiled.raid_value(merc, king, [knight], econ_config)
+    assert rv == max(0, merc.wealth.raid - 5)
+
+
+def test_unsafe_operation_rejected():
+    """Test that unsafe operations are rejected during validation."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': '__import__("os").system("ls")',  # Unsafe!
+                'params': {}
+            },
+            'bribe_outcome': {'condition': 'True'},
+            'p_knight_win': {'formula': '0.5'},
+            'trade_action': {'params': {}}
+        }
+    }
+    
+    compiler = PolicyCompiler(config)
+    
+    with pytest.raises(PolicyCompilationError):
+        compiler.compile()
+
+
+def test_attribute_access(sample_policy_config, sample_agents):
+    """Test that attribute access works in formulas."""
+    king, knight, merc = sample_agents
+    config = EconomicConfig()
+    
+    compiler = PolicyCompiler(sample_policy_config)
+    compiled = compiler.compile()
+    
+    # The formula accesses merc.raid, merc.sense, etc.
+    rv = compiled.raid_value(merc, king, [knight], config)
+    
+    # Should not raise an error
+    assert isinstance(rv, float)
 
 
 def test_pure_functions():
-    """Test that compiled functions are pure (no side effects)."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.raid * 1.0'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agents
-    merc = Agent(
-        id="M-01",
-        tape_id=1,
-        role=Role.MERCENARY,
-        currency=100,
-        wealth=WealthTraits(raid=10)
-    )
-    
-    king = Agent(
-        id="K-01",
-        tape_id=2,
-        role=Role.KING,
-        currency=1000,
-        wealth=WealthTraits(defend=20)
-    )
-    
-    config = EconomicConfig()
-    
-    # Call function multiple times
-    rv1 = compiled.raid_value(merc, king, [], config)
-    rv2 = compiled.raid_value(merc, king, [], config)
-    
-    # Should return same result (deterministic)
-    assert rv1 == rv2
-    
-    # Agent state should not be modified
-    assert merc.currency == 100
-    assert king.currency == 1000
-
-
-def test_formula_validation_enhanced():
-    """Test enhanced formula validation."""
-    # Test empty formula
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': ''},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    assert len(errors) > 0
-    assert any('non-empty string' in err for err in errors)
-    
-    # Test formula with method calls
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.some_method()'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    assert len(errors) > 0
-    assert any('Method calls not allowed' in err for err in errors)
-    
-    # Test formula with syntax error (assignments not allowed in eval mode)
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'x = 5'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    assert len(errors) > 0
-    # Assignment in eval mode causes syntax error
-    assert any('Syntax error' in err or 'Assignments not allowed' in err for err in errors)
-
-
-def test_compiled_policies_against_known_inputs():
-    """Test compiled policies against known inputs."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'version': '1.0.0',
-            'functions': {
-                'raid_value': {
-                    'formula': 'merc.wealth.raid * 1.5 + merc.wealth.sense * 0.5',
-                },
-                'p_knight_win': {
-                    'formula': 'clamp(0.05, 0.95, 0.5)',
-                },
-                'bribe_outcome': {
-                    'conditions': [
-                        {'if': 'king.currency >= 500', 'result': 'accepted'},
-                        {'else': True, 'result': 'rejected'}
-                    ]
-                },
-                'trade_action': {
-                    'conditions': [
-                        {'if': 'king.currency >= 100', 'result': 'success'},
-                        {'else': True, 'result': 'insufficient_funds'}
-                    ]
-                }
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agents
-    test_agents = {
-        'merc': Agent(
-            id="M-01",
-            tape_id=1,
-            role=Role.MERCENARY,
-            currency=100,
-            wealth=WealthTraits(raid=10, sense=6, adapt=3)
-        ),
-        'king': Agent(
-            id="K-01",
-            tape_id=2,
-            role=Role.KING,
-            currency=1000,
-            wealth=WealthTraits(defend=20)
-        ),
-        'knight': Agent(
-            id="N-01",
-            tape_id=3,
-            role=Role.KNIGHT,
-            currency=200,
-            wealth=WealthTraits(defend=15)
-        ),
-        'knights': []
-    }
-    
-    config = EconomicConfig()
-    
-    # Test against known inputs
-    results = compiler.test_compiled_policies(compiled, test_agents, config)
-    
-    assert results['passed'] == True
-    assert 'raid_value' in results['tests']
-    assert 'p_knight_win' in results['tests']
-    assert 'bribe_outcome' in results['tests']
-    assert 'trade_action' in results['tests']
-    
-    # Verify raid_value calculation
-    # Should be: 10 * 1.5 + 6 * 0.5 = 15 + 3 = 18
-    assert results['tests']['raid_value']['result'] == 18.0
-    assert results['tests']['raid_value']['valid'] == True
-    
-    # Verify p_knight_win is in valid range
-    assert results['tests']['p_knight_win']['valid'] == True
-    assert 0.0 <= results['tests']['p_knight_win']['result'] <= 1.0
-    
-    # Verify bribe_outcome structure
-    assert results['tests']['bribe_outcome']['valid'] == True
-    assert 'accepted' in results['tests']['bribe_outcome']['result']
-    
-    # Verify trade_action structure
-    assert results['tests']['trade_action']['valid'] == True
-    assert 'success' in results['tests']['trade_action']['result']
-
-
-def test_determinism_verification():
-    """Test that compiled policies are deterministic."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {
-                    'formula': 'merc.wealth.raid * 2.0 + king.wealth.defend * 0.5',
-                },
-                'p_knight_win': {
-                    'formula': 'clamp(0.05, 0.95, 0.5 + sigmoid(0.3 * (knight.wealth.defend - merc.wealth.raid)) - 0.5)',
-                },
-                'bribe_outcome': {
-                    'conditions': [
-                        {'if': 'threshold >= raid_value', 'result': 'accepted'},
-                        {'else': True, 'result': 'rejected'}
-                    ]
-                },
-                'trade_action': {
-                    'conditions': [
-                        {'if': 'king.currency >= invest_amount', 'result': 'success'},
-                        {'else': True, 'result': 'insufficient_funds'}
-                    ]
-                }
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agents
-    test_agents = {
-        'merc': Agent(
-            id="M-01",
-            tape_id=1,
-            role=Role.MERCENARY,
-            currency=100,
-            wealth=WealthTraits(raid=10, sense=5, adapt=3)
-        ),
-        'king': Agent(
-            id="K-01",
-            tape_id=2,
-            role=Role.KING,
-            currency=1000,
-            wealth=WealthTraits(defend=20),
-            bribe_threshold=150
-        ),
-        'knight': Agent(
-            id="N-01",
-            tape_id=3,
-            role=Role.KNIGHT,
-            currency=200,
-            wealth=WealthTraits(defend=15)
-        ),
-        'knights': []
-    }
-    
-    config = EconomicConfig()
-    
-    # Verify determinism
-    results = compiler.verify_determinism(compiled, test_agents, config, iterations=20)
-    
-    assert results['deterministic'] == True
-    assert len(results['errors']) == 0
-    
-    # Check each function
-    assert results['functions']['raid_value']['deterministic'] == True
-    assert results['functions']['p_knight_win']['deterministic'] == True
-    assert results['functions']['bribe_outcome']['deterministic'] == True
-    assert results['functions']['trade_action']['deterministic'] == True
-    
-    # Verify all values in raid_value are identical
-    rv_values = results['functions']['raid_value']['values']
-    assert all(v == rv_values[0] for v in rv_values)
-
-
-def test_policy_purity_no_side_effects():
-    """Test that policies don't modify agent state (pure functions)."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.raid * 1.0'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    compiled = compiler.compile()
-    
-    # Create test agents
-    merc = Agent(
-        id="M-01",
-        tape_id=1,
-        role=Role.MERCENARY,
-        currency=100,
-        wealth=WealthTraits(raid=10, sense=5, adapt=3)
-    )
-    
-    king = Agent(
-        id="K-01",
-        tape_id=2,
-        role=Role.KING,
-        currency=1000,
-        wealth=WealthTraits(defend=20),
-        bribe_threshold=150
-    )
-    
-    knight = Agent(
-        id="N-01",
-        tape_id=3,
-        role=Role.KNIGHT,
-        currency=200,
-        wealth=WealthTraits(defend=15)
-    )
-    
-    config = EconomicConfig()
-    
-    # Store original values
-    merc_currency_orig = merc.currency
-    merc_raid_orig = merc.wealth.raid
-    king_currency_orig = king.currency
-    king_defend_orig = king.wealth.defend
-    knight_currency_orig = knight.currency
-    knight_defend_orig = knight.wealth.defend
-    
-    # Call all functions multiple times
-    for _ in range(5):
-        compiled.raid_value(merc, king, [], config)
-        compiled.p_knight_win(knight, merc, config)
-        compiled.bribe_outcome(king, merc, [], config, compiled.raid_value)
-        compiled.trade_action(king, config)
-    
-    # Verify no state changes
-    assert merc.currency == merc_currency_orig
-    assert merc.wealth.raid == merc_raid_orig
-    assert king.currency == king_currency_orig
-    assert king.wealth.defend == king_defend_orig
-    assert knight.currency == knight_currency_orig
-    assert knight.wealth.defend == knight_defend_orig
-
-
-def test_invalid_formula_syntax():
-    """Test that invalid formula syntax is caught during validation."""
-    # Test with syntax error
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.raid * ('},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    
-    assert len(errors) > 0
-    assert any('Syntax error' in err for err in errors)
-
-
-def test_unsafe_function_calls():
-    """Test that unsafe function calls are rejected."""
-    # Test with eval
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': 'eval("1 + 1")'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    
-    assert len(errors) > 0
-    assert any('eval not allowed' in err for err in errors)
-    
-    # Test with __import__
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {'formula': '__import__("os")'},
-                'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    
-    assert len(errors) > 0
-    assert any('__import__ not allowed' in err for err in errors)
-
-
-def test_safe_builtin_functions():
-    """Test that safe builtin functions are allowed."""
-    policy = {
-        'policy': {
-            'name': 'test',
-            'functions': {
-                'raid_value': {
-                    'formula': 'max(0, min(100, abs(merc.wealth.raid - king.wealth.defend)))'
-                },
-                'p_knight_win': {
-                    'formula': 'clamp(0.05, 0.95, sigmoid(0.3 * knight.wealth.defend))'
-                },
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
-            }
-        }
-    }
-    
-    compiler = PolicyCompiler(policy)
-    errors = compiler.validate()
-    
-    # Should have no errors - all functions are safe
-    assert len(errors) == 0
-    
-    # Should compile successfully
-    compiled = compiler.compile()
-    assert compiled is not None
-
-
-def test_parameter_validation():
-    """Test that parameters are validated correctly."""
-    # Test with non-numeric parameter
-    policy = {
-        'policy': {
-            'name': 'test',
-            'parameters': {
-                'alpha': 1.0,
-                'beta': 'not_a_number',  # Invalid
+    """Test that compiled functions are pure (no side effects except trade)."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'merc.wealth.raid * 2',
+                'params': {}
             },
-            'functions': {
-                'raid_value': {'formula': 'merc.wealth.raid * alpha'},
+            'bribe_outcome': {'condition': 'False'},
+            'p_knight_win': {'formula': '0.5'},
+            'trade_action': {'params': {'invest_per_tick': 100}}
+        }
+    }
+    
+    king = Agent(
+        id="K-01", tape_id=1, role=Role.KING, currency=5000,
+        wealth=WealthTraits(compute=10, copy=12, defend=20, raid=2, trade=15, sense=5, adapt=7)
+    )
+    merc = Agent(
+        id="M-01", tape_id=3, role=Role.MERCENARY, currency=50,
+        wealth=WealthTraits(compute=1, copy=3, defend=0, raid=12, trade=0, sense=6, adapt=4)
+    )
+    
+    econ_config = EconomicConfig()
+    compiler = PolicyCompiler(config)
+    compiled = compiler.compile()
+    
+    # Call raid_value multiple times
+    initial_raid = merc.wealth.raid
+    rv1 = compiled.raid_value(merc, king, [], econ_config)
+    rv2 = compiled.raid_value(merc, king, [], econ_config)
+    
+    # Should be deterministic and not modify agents
+    assert rv1 == rv2
+    assert merc.wealth.raid == initial_raid
+
+
+# ============================================================================
+# Task 7.3: Additional validation and testing
+# ============================================================================
+
+def test_formula_syntax_validation_before_compilation():
+    """Test that formula syntax is validated before compilation."""
+    # Test various invalid syntax cases
+    invalid_configs = [
+        {
+            'policies': {
+                'raid_value': {'formula': 'merc.raid +'},  # Incomplete expression
+                'bribe_outcome': {'condition': 'True'},
                 'p_knight_win': {'formula': '0.5'},
-                'bribe_outcome': {'conditions': [{'if': 'True', 'result': 'accepted'}]},
-                'trade_action': {'conditions': [{'if': 'True', 'result': 'success'}]},
+                'trade_action': {'params': {}}
+            }
+        },
+        {
+            'policies': {
+                'raid_value': {'formula': 'merc.raid * * 2'},  # Double operator
+                'bribe_outcome': {'condition': 'True'},
+                'p_knight_win': {'formula': '0.5'},
+                'trade_action': {'params': {}}
+            }
+        },
+        {
+            'policies': {
+                'raid_value': {'formula': 'merc.raid'},
+                'bribe_outcome': {'condition': '(threshold >= raid_value'},  # Unmatched paren
+                'p_knight_win': {'formula': '0.5'},
+                'trade_action': {'params': {}}
+            }
+        },
+    ]
+    
+    for config in invalid_configs:
+        compiler = PolicyCompiler(config)
+        errors = compiler.validate()
+        assert len(errors) > 0, f"Expected validation errors for config: {config}"
+
+
+def test_unsafe_operations_validation():
+    """Test that unsafe operations are caught during validation."""
+    unsafe_configs = [
+        {
+            'policies': {
+                'raid_value': {'formula': 'eval("1+1")'},  # eval is unsafe
+                'bribe_outcome': {'condition': 'True'},
+                'p_knight_win': {'formula': '0.5'},
+                'trade_action': {'params': {}}
+            }
+        },
+        {
+            'policies': {
+                'raid_value': {'formula': 'exec("print(1)")'},  # exec is unsafe
+                'bribe_outcome': {'condition': 'True'},
+                'p_knight_win': {'formula': '0.5'},
+                'trade_action': {'params': {}}
+            }
+        },
+        {
+            'policies': {
+                'raid_value': {'formula': 'open("/etc/passwd")'},  # file access is unsafe
+                'bribe_outcome': {'condition': 'True'},
+                'p_knight_win': {'formula': '0.5'},
+                'trade_action': {'params': {}}
+            }
+        },
+    ]
+    
+    for config in unsafe_configs:
+        compiler = PolicyCompiler(config)
+        with pytest.raises((PolicyCompilationError, PolicyValidationError)):
+            compiler.compile()
+
+
+def test_generated_functions_with_known_inputs():
+    """Test generated functions against known inputs with expected outputs."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': '2 * merc.wealth.raid + 10',
+                'params': {}
+            },
+            'bribe_outcome': {
+                'condition': 'threshold >= raid_value and king.currency >= threshold',
+                'on_success': {
+                    'king_currency': '-threshold',
+                    'merc_currency': '+threshold',
+                    'king_wealth_leakage': 0.05
+                }
+            },
+            'p_knight_win': {
+                'formula': '0.6',  # Fixed probability for testing
+                'params': {}
+            },
+            'trade_action': {
+                'params': {
+                    'invest_per_tick': 100,
+                    'created_wealth_units': 5,
+                    'distribution': {'defend': 3, 'trade': 2}
+                }
             }
         }
     }
     
-    compiler = PolicyCompiler(policy)
+    # Create test agents with known values
+    king = Agent(
+        id="K-01", tape_id=1, role=Role.KING, currency=1000,
+        wealth=WealthTraits(compute=5, copy=5, defend=10, raid=0, trade=5, sense=3, adapt=2),
+        bribe_threshold=50
+    )
+    merc = Agent(
+        id="M-01", tape_id=3, role=Role.MERCENARY, currency=100,
+        wealth=WealthTraits(compute=1, copy=1, defend=0, raid=20, trade=0, sense=2, adapt=1)
+    )
+    knight = Agent(
+        id="N-01", tape_id=2, role=Role.KNIGHT, currency=200,
+        wealth=WealthTraits(compute=2, copy=1, defend=15, raid=0, trade=0, sense=5, adapt=3)
+    )
+    
+    econ_config = EconomicConfig()
+    compiler = PolicyCompiler(config)
+    compiled = compiler.compile()
+    
+    # Test raid_value with known formula: 2 * 20 + 10 = 50
+    rv = compiled.raid_value(merc, king, [knight], econ_config)
+    assert rv == 50.0, f"Expected raid_value=50.0, got {rv}"
+    
+    # Test p_knight_win with fixed value
+    p = compiled.p_knight_win(knight, merc, econ_config)
+    assert p == 0.6, f"Expected p_knight_win=0.6, got {p}"
+    
+    # Test bribe_outcome with threshold=50, raid_value=50 (should succeed)
+    outcome = compiled.bribe_outcome(king, merc, [knight], econ_config, rv)
+    assert outcome.accepted == True, "Expected bribe to be accepted"
+    assert outcome.amount == 50, f"Expected bribe amount=50, got {outcome.amount}"
+
+
+def test_determinism_of_compiled_policies():
+    """Test that compiled policies produce deterministic results."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'alpha*merc.wealth.raid + beta*(merc.wealth.sense+merc.wealth.adapt)',
+                'params': {'alpha': 1.5, 'beta': 0.3}
+            },
+            'bribe_outcome': {
+                'condition': 'threshold >= raid_value and king.currency >= threshold',
+                'on_success': {
+                    'king_currency': '-threshold',
+                    'merc_currency': '+threshold',
+                    'king_wealth_leakage': 0.05
+                }
+            },
+            'p_knight_win': {
+                'formula': 'clamp(0.5 + sigmoid(0.3 * trait_delta) - 0.5, 0.05, 0.95)',
+                'params': {}
+            },
+            'trade_action': {
+                'params': {
+                    'invest_per_tick': 100,
+                    'created_wealth_units': 5,
+                    'distribution': {'defend': 3, 'trade': 2}
+                }
+            }
+        }
+    }
+    
+    # Create test agents
+    king = Agent(
+        id="K-01", tape_id=1, role=Role.KING, currency=5000,
+        wealth=WealthTraits(compute=10, copy=12, defend=20, raid=2, trade=15, sense=5, adapt=7),
+        bribe_threshold=300
+    )
+    merc = Agent(
+        id="M-01", tape_id=3, role=Role.MERCENARY, currency=50,
+        wealth=WealthTraits(compute=1, copy=3, defend=0, raid=12, trade=0, sense=6, adapt=4)
+    )
+    knight = Agent(
+        id="N-01", tape_id=2, role=Role.KNIGHT, currency=200,
+        wealth=WealthTraits(compute=3, copy=2, defend=15, raid=1, trade=0, sense=8, adapt=5)
+    )
+    
+    econ_config = EconomicConfig()
+    
+    # Compile policies multiple times
+    compiler1 = PolicyCompiler(config)
+    compiled1 = compiler1.compile()
+    
+    compiler2 = PolicyCompiler(config)
+    compiled2 = compiler2.compile()
+    
+    # Test raid_value determinism
+    rv1_a = compiled1.raid_value(merc, king, [knight], econ_config)
+    rv1_b = compiled1.raid_value(merc, king, [knight], econ_config)
+    rv2 = compiled2.raid_value(merc, king, [knight], econ_config)
+    
+    assert rv1_a == rv1_b, "Same compiled function should produce same result"
+    assert rv1_a == rv2, "Different compilations should produce same result"
+    
+    # Test p_knight_win determinism
+    p1_a = compiled1.p_knight_win(knight, merc, econ_config)
+    p1_b = compiled1.p_knight_win(knight, merc, econ_config)
+    p2 = compiled2.p_knight_win(knight, merc, econ_config)
+    
+    assert p1_a == p1_b, "Same compiled function should produce same result"
+    assert p1_a == p2, "Different compilations should produce same result"
+    
+    # Test bribe_outcome determinism
+    outcome1_a = compiled1.bribe_outcome(king, merc, [knight], econ_config, rv1_a)
+    outcome1_b = compiled1.bribe_outcome(king, merc, [knight], econ_config, rv1_a)
+    outcome2 = compiled2.bribe_outcome(king, merc, [knight], econ_config, rv2)
+    
+    assert outcome1_a.accepted == outcome1_b.accepted, "Same compiled function should produce same result"
+    assert outcome1_a.accepted == outcome2.accepted, "Different compilations should produce same result"
+
+
+def test_determinism_with_different_agent_states():
+    """Test that policies are deterministic for various agent states."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'merc.wealth.raid * 1.5',
+                'params': {}
+            },
+            'bribe_outcome': {
+                'condition': 'threshold >= raid_value and king.currency >= threshold',
+                'on_success': {
+                    'king_currency': '-threshold',
+                    'merc_currency': '+threshold',
+                    'king_wealth_leakage': 0.05
+                }
+            },
+            'p_knight_win': {
+                'formula': '0.5',
+                'params': {}
+            },
+            'trade_action': {
+                'params': {'invest_per_tick': 100}
+            }
+        }
+    }
+    
+    compiler = PolicyCompiler(config)
+    compiled = compiler.compile()
+    econ_config = EconomicConfig()
+    
+    # Test with multiple different agent configurations
+    test_cases = [
+        (10, 5, 8),   # (merc_raid, knight_defend, king_defend)
+        (20, 15, 10),
+        (5, 25, 30),
+        (0, 0, 0),
+        (100, 50, 75),
+    ]
+    
+    for merc_raid, knight_defend, king_defend in test_cases:
+        king = Agent(
+            id="K-01", tape_id=1, role=Role.KING, currency=5000,
+            wealth=WealthTraits(compute=10, copy=12, defend=king_defend, raid=2, trade=15, sense=5, adapt=7),
+            bribe_threshold=300
+        )
+        merc = Agent(
+            id="M-01", tape_id=3, role=Role.MERCENARY, currency=50,
+            wealth=WealthTraits(compute=1, copy=3, defend=0, raid=merc_raid, trade=0, sense=6, adapt=4)
+        )
+        knight = Agent(
+            id="N-01", tape_id=2, role=Role.KNIGHT, currency=200,
+            wealth=WealthTraits(compute=3, copy=2, defend=knight_defend, raid=1, trade=0, sense=8, adapt=5)
+        )
+        
+        # Call multiple times with same inputs
+        rv1 = compiled.raid_value(merc, king, [knight], econ_config)
+        rv2 = compiled.raid_value(merc, king, [knight], econ_config)
+        
+        assert rv1 == rv2, f"Non-deterministic result for raid={merc_raid}"
+        assert rv1 == merc_raid * 1.5, f"Incorrect calculation for raid={merc_raid}"
+
+
+def test_validation_catches_missing_formula_and_condition():
+    """Test that validation catches policies missing both formula and condition."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'params': {'alpha': 1.0}  # Missing formula
+            },
+            'bribe_outcome': {'condition': 'True'},
+            'p_knight_win': {'formula': '0.5'},
+            'trade_action': {'params': {}}
+        }
+    }
+    
+    compiler = PolicyCompiler(config)
     errors = compiler.validate()
     
     assert len(errors) > 0
-    assert any('beta' in err and 'numeric' in err for err in errors)
+    assert any('formula' in err.lower() or 'condition' in err.lower() for err in errors)
+
+
+def test_validation_with_complex_formulas():
+    """Test validation with complex but valid formulas."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'max(0, alpha*merc.wealth.raid + beta*(merc.wealth.sense+merc.wealth.adapt) - gamma*king_defend + delta*king_exposed)',
+                'params': {'alpha': 1.0, 'beta': 0.25, 'gamma': 0.6, 'delta': 0.4}
+            },
+            'bribe_outcome': {
+                'condition': 'threshold >= raid_value and king.currency >= threshold',
+                'on_success': {
+                    'king_currency': '-threshold',
+                    'merc_currency': '+threshold',
+                    'king_wealth_leakage': 0.05
+                }
+            },
+            'p_knight_win': {
+                'formula': 'clamp(0.5 + (sigmoid(0.3 * trait_delta) - 0.5), 0.05, 0.95)',
+                'params': {}
+            },
+            'trade_action': {
+                'params': {'invest_per_tick': 100}
+            }
+        }
+    }
+    
+    compiler = PolicyCompiler(config)
+    errors = compiler.validate()
+    
+    assert len(errors) == 0, f"Valid complex formulas should not produce errors: {errors}"
+
+
+def test_compiled_functions_are_pure():
+    """Test that compiled functions don't modify input agents (except trade_action)."""
+    config = {
+        'policies': {
+            'raid_value': {
+                'formula': 'merc.wealth.raid + king.wealth.defend',
+                'params': {}
+            },
+            'bribe_outcome': {
+                'condition': 'False',  # Always reject
+                'on_success': {}
+            },
+            'p_knight_win': {
+                'formula': 'knight.wealth.defend / (knight.wealth.defend + merc.wealth.raid + 1)',
+                'params': {}
+            },
+            'trade_action': {
+                'params': {'invest_per_tick': 100}
+            }
+        }
+    }
+    
+    king = Agent(
+        id="K-01", tape_id=1, role=Role.KING, currency=5000,
+        wealth=WealthTraits(compute=10, copy=12, defend=20, raid=2, trade=15, sense=5, adapt=7),
+        bribe_threshold=300
+    )
+    merc = Agent(
+        id="M-01", tape_id=3, role=Role.MERCENARY, currency=50,
+        wealth=WealthTraits(compute=1, copy=3, defend=0, raid=12, trade=0, sense=6, adapt=4)
+    )
+    knight = Agent(
+        id="N-01", tape_id=2, role=Role.KNIGHT, currency=200,
+        wealth=WealthTraits(compute=3, copy=2, defend=15, raid=1, trade=0, sense=8, adapt=5)
+    )
+    
+    # Save initial states
+    king_initial = (king.currency, king.wealth.defend, king.wealth.trade)
+    merc_initial = (merc.currency, merc.wealth.raid)
+    knight_initial = (knight.currency, knight.wealth.defend)
+    
+    compiler = PolicyCompiler(config)
+    compiled = compiler.compile()
+    econ_config = EconomicConfig()
+    
+    # Call raid_value (should be pure)
+    rv = compiled.raid_value(merc, king, [knight], econ_config)
+    assert (king.currency, king.wealth.defend, king.wealth.trade) == king_initial
+    assert (merc.currency, merc.wealth.raid) == merc_initial
+    
+    # Call p_knight_win (should be pure)
+    p = compiled.p_knight_win(knight, merc, econ_config)
+    assert (knight.currency, knight.wealth.defend) == knight_initial
+    assert (merc.currency, merc.wealth.raid) == merc_initial
+    
+    # Call bribe_outcome (should be pure)
+    outcome = compiled.bribe_outcome(king, merc, [knight], econ_config, rv)
+    assert (king.currency, king.wealth.defend, king.wealth.trade) == king_initial
+    assert (merc.currency, merc.wealth.raid) == merc_initial
 
 
 if __name__ == '__main__':

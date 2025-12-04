@@ -120,7 +120,7 @@ class TraitEmergenceConfig:
     enabled: bool = True
     rules: List[Dict[str, Any]] = field(default_factory=lambda: [
         {
-            "condition": "copy >= 12 AND tick % 2 == 0",
+            "condition": "copy >= 12 and tick % 2 == 0",
             "delta": {"copy": 1}
         }
     ])

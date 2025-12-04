@@ -1,82 +1,127 @@
-"""Tests for EventAggregator."""
+"""Tests for event aggregator."""
 
-from core.event_aggregator import EventAggregator, TickSummary
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from core.event_aggregator import EventAggregator
 from core.models import Event, EventType, Agent, Role, WealthTraits
 
 
-def test_add_event():
-    """Test adding events to aggregator."""
+def test_event_aggregator_initialization():
+    """Test that EventAggregator can be initialized."""
     aggregator = EventAggregator()
     
-    event = Event(
-        tick=1,
-        type=EventType.TRADE,
-        king="K-01",
-        invest=100,
-        wealth_created=5
-    )
+    assert aggregator.events == []
+    assert aggregator.agents is None
+
+
+def test_add_event():
+    """Test adding events to the aggregator."""
+    aggregator = EventAggregator()
     
-    aggregator.add_event(event)
+    event1 = Event(tick=1, type=EventType.TRADE, king="K-01", invest=100)
+    event2 = Event(tick=1, type=EventType.RETAINER, king="K-01", knight="N-01", amount=50)
     
-    assert len(aggregator.events) == 1
-    assert aggregator.events[0] == event
-    assert 1 in aggregator.tick_summaries
+    aggregator.add_event(event1)
+    aggregator.add_event(event2)
+    
+    assert len(aggregator.events) == 2
+    assert aggregator.events[0] == event1
+    assert aggregator.events[1] == event2
 
 
 def test_get_tick_summary():
-    """Test getting tick summary."""
+    """Test generating tick summary."""
     aggregator = EventAggregator()
     
-    # Add multiple events for tick 1
+    # Add events for tick 1
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01", invest=100))
+    aggregator.add_event(Event(tick=1, type=EventType.RETAINER, king="K-01", knight="N-01", amount=50))
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01", amount=200))
+    
+    # Add events for tick 2
+    aggregator.add_event(Event(tick=2, type=EventType.TRADE, king="K-02", invest=100))
+    
+    # Get summary for tick 1
+    summary = aggregator.get_tick_summary(tick_num=1)
+    
+    assert summary["tick"] == 1
+    assert "event_counts" in summary
+    assert "currency_flows" in summary
+    assert "wealth_changes" in summary
+    
+    # Check event counts
+    assert summary["event_counts"]["trade"] == 1
+    assert summary["event_counts"]["retainer"] == 1
+    assert summary["event_counts"]["bribe_accept"] == 1
+
+
+def test_compute_event_counts():
+    """Test event count computation."""
+    aggregator = EventAggregator()
+    
     aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01"))
-    aggregator.add_event(Event(tick=1, type=EventType.RETAINER, knight="N-01", amount=25))
-    aggregator.add_event(Event(tick=2, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01", amount=350))
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-02"))
+    aggregator.add_event(Event(tick=1, type=EventType.RETAINER, king="K-01", knight="N-01"))
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01"))
     
-    summary1 = aggregator.get_tick_summary(1)
-    assert summary1 is not None
-    assert summary1.tick == 1
-    assert summary1.event_counts["trade"] == 1
-    assert summary1.event_counts["retainer"] == 1
+    summary = aggregator.get_tick_summary(tick_num=1)
+    counts = summary["event_counts"]
     
-    summary2 = aggregator.get_tick_summary(2)
-    assert summary2 is not None
-    assert summary2.event_counts["bribe_accept"] == 1
+    assert counts["trade"] == 2
+    assert counts["retainer"] == 1
+    assert counts["bribe_accept"] == 1
 
 
-def test_currency_flows():
-    """Test currency flow tracking."""
+def test_compute_currency_flows():
+    """Test currency flow computation."""
     aggregator = EventAggregator()
     
-    # Bribe: King pays merc
-    aggregator.add_event(Event(
-        tick=1,
-        type=EventType.BRIBE_ACCEPT,
-        king="K-01",
-        merc="M-01",
-        amount=350
-    ))
+    # Bribe: king loses 200, merc gains 200
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01", amount=200))
     
-    summary = aggregator.get_tick_summary(1)
-    assert summary.currency_flows["king"] == -350
-    assert summary.currency_flows["mercenary"] == 350
+    # Trade: king loses 100
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01", invest=100))
+    
+    # Retainer: king loses 50, knight gains 50
+    aggregator.add_event(Event(tick=1, type=EventType.RETAINER, king="K-01", knight="N-01", amount=50))
+    
+    # Defend win: merc loses 30, knight gains 30
+    aggregator.add_event(Event(tick=1, type=EventType.DEFEND_WIN, king="K-01", knight="N-01", merc="M-01", stake=30))
+    
+    summary = aggregator.get_tick_summary(tick_num=1)
+    flows = summary["currency_flows"]
+    
+    # King: lost 200 (bribe) + 100 (trade) + 50 (retainer) = 350
+    assert flows["king"]["lost"] == 350
+    assert flows["king"]["gained"] == 0
+    
+    # Knight: gained 50 (retainer) + 30 (defend win) = 80
+    assert flows["knight"]["gained"] == 80
+    assert flows["knight"]["lost"] == 0
+    
+    # Mercenary: gained 200 (bribe), lost 30 (defend loss)
+    assert flows["mercenary"]["gained"] == 200
+    assert flows["mercenary"]["lost"] == 30
 
 
-def test_wealth_changes():
-    """Test wealth change tracking."""
+def test_compute_wealth_changes():
+    """Test wealth change computation."""
     aggregator = EventAggregator()
     
-    # Trade creates wealth
-    aggregator.add_event(Event(
-        tick=1,
-        type=EventType.TRADE,
-        king="K-01",
-        invest=100,
-        wealth_created=5
-    ))
+    # Trade creates wealth: +3 defend, +2 trade
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01", invest=100, wealth_created=5))
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-02", invest=100, wealth_created=5))
     
-    summary = aggregator.get_tick_summary(1)
-    assert summary.wealth_changes["king"]["defend"] == 3
-    assert summary.wealth_changes["king"]["trade"] == 2
+    summary = aggregator.get_tick_summary(tick_num=1)
+    changes = summary["wealth_changes"]
+    
+    # Kings should have gained wealth from trades
+    assert changes["king"]["defend"] == 6  # 2 trades * 3 defend each
+    assert changes["king"]["trade"] == 4   # 2 trades * 2 trade each
 
 
 def test_compute_metrics():
@@ -85,160 +130,227 @@ def test_compute_metrics():
     
     # Create test agents
     agents = [
-        Agent(
-            id="K-01",
-            tape_id=1,
-            role=Role.KING,
-            currency=5000,
-            wealth=WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=18, sense=7, adapt=9)
-        ),
-        Agent(
-            id="N-01",
-            tape_id=2,
-            role=Role.KNIGHT,
-            currency=200,
-            wealth=WealthTraits(compute=8, copy=12, defend=18, raid=3, trade=10, sense=6, adapt=7)
-        ),
-        Agent(
-            id="M-01",
-            tape_id=3,
-            role=Role.MERCENARY,
-            currency=50,
-            wealth=WealthTraits(compute=5, copy=8, defend=10, raid=15, trade=5, sense=8, adapt=10)
-        )
+        Agent(id="K-01", tape_id=0, role=Role.KING, currency=1000, 
+              wealth=WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=10, sense=8, adapt=7)),
+        Agent(id="N-01", tape_id=1, role=Role.KNIGHT, currency=500,
+              wealth=WealthTraits(compute=8, copy=12, defend=18, raid=3, trade=6, sense=5, adapt=4)),
+        Agent(id="M-01", tape_id=2, role=Role.MERCENARY, currency=100,
+              wealth=WealthTraits(compute=5, copy=8, defend=10, raid=15, trade=3, sense=6, adapt=8)),
     ]
+    
+    # Add some events
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01"))
+    aggregator.add_event(Event(tick=1, type=EventType.DEFEND_WIN, king="K-01", knight="N-01", merc="M-01"))
+    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01"))
     
     metrics = aggregator.compute_metrics(agents)
     
-    assert metrics.wealth_total == 84 + 64 + 61  # Sum of all wealth
-    assert metrics.currency_total == 5250
+    # Check basic metrics
+    assert metrics.wealth_total == sum(a.wealth_total() for a in agents)
+    assert metrics.currency_total == sum(a.currency for a in agents)
     assert metrics.copy_score_mean > 0
-    assert metrics.entropy > 0
-    assert metrics.compression_ratio > 0
+    
+    # Check event counts
+    assert metrics.bribes_accepted == 1
+    assert metrics.raids_won_by_knight == 1
 
 
-def test_compute_entropy():
-    """Test entropy computation."""
+def test_compute_metrics_event_counts():
+    """Test that metrics correctly count different event types."""
     aggregator = EventAggregator()
     
-    # Equal wealth distribution should have high entropy
-    equal_agents = [
-        Agent(id=f"A-{i}", tape_id=i, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10))
-        for i in range(5)
+    agents = [
+        Agent(id="K-01", tape_id=0, role=Role.KING, currency=1000, 
+              wealth=WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=10, sense=8, adapt=7)),
     ]
     
-    entropy_equal = aggregator._compute_entropy(equal_agents)
+    # Add various events
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01"))
+    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_INSUFFICIENT, king="K-01", merc="M-02"))
+    aggregator.add_event(Event(tick=1, type=EventType.DEFEND_WIN, king="K-01", knight="N-01", merc="M-03"))
+    aggregator.add_event(Event(tick=1, type=EventType.DEFEND_LOSS, king="K-01", knight="N-01", merc="M-04"))
+    aggregator.add_event(Event(tick=1, type=EventType.UNOPPOSED_RAID, king="K-01", merc="M-05"))
     
-    # Unequal wealth distribution should have lower entropy
-    unequal_agents = [
-        Agent(id="A-0", tape_id=0, role=Role.KING, currency=100,
-              wealth=WealthTraits(compute=50, copy=50, defend=50, raid=50, trade=50, sense=50, adapt=50)),
-        Agent(id="A-1", tape_id=1, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
-        Agent(id="A-2", tape_id=2, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
-    ]
+    metrics = aggregator.compute_metrics(agents)
     
-    entropy_unequal = aggregator._compute_entropy(unequal_agents)
+    # Bribes paid = bribe_accept + bribe_insufficient
+    assert metrics.bribes_paid == 2
+    assert metrics.bribes_accepted == 1
     
-    assert entropy_equal > entropy_unequal
+    # Raids attempted = defend_win + defend_loss + unopposed_raid
+    assert metrics.raids_attempted == 3
+    assert metrics.raids_won_by_knight == 1
+    assert metrics.raids_won_by_merc == 2  # defend_loss + unopposed_raid
 
 
 def test_compute_gini_coefficient():
     """Test Gini coefficient computation."""
     aggregator = EventAggregator()
     
-    # Perfect equality (Gini = 0)
+    # Perfect equality: all agents have same wealth
     equal_agents = [
-        Agent(id=f"A-{i}", tape_id=i, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10))
-        for i in range(5)
-    ]
-    
-    gini_equal = aggregator.compute_gini_coefficient(equal_agents)
-    assert gini_equal < 0.1  # Close to 0
-    
-    # High inequality
-    unequal_agents = [
-        Agent(id="A-0", tape_id=0, role=Role.KING, currency=100,
-              wealth=WealthTraits(compute=100, copy=100, defend=100, raid=100, trade=100, sense=100, adapt=100)),
-        Agent(id="A-1", tape_id=1, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
-        Agent(id="A-2", tape_id=2, role=Role.MERCENARY, currency=100,
-              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
-    ]
-    
-    gini_unequal = aggregator.compute_gini_coefficient(unequal_agents)
-    assert gini_unequal > 0.3  # Higher inequality
-
-
-def test_get_wealth_distribution_by_role():
-    """Test wealth distribution by role."""
-    aggregator = EventAggregator()
-    
-    agents = [
-        Agent(id="K-01", tape_id=1, role=Role.KING, currency=5000,
-              wealth=WealthTraits(compute=20, copy=20, defend=20, raid=20, trade=20, sense=20, adapt=20)),
-        Agent(id="K-02", tape_id=2, role=Role.KING, currency=6000,
-              wealth=WealthTraits(compute=30, copy=30, defend=30, raid=30, trade=30, sense=30, adapt=30)),
-        Agent(id="N-01", tape_id=3, role=Role.KNIGHT, currency=200,
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+        Agent(id="A-02", tape_id=1, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+        Agent(id="A-03", tape_id=2, role=Role.KING, currency=100,
               wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
     ]
     
-    distribution = aggregator.get_wealth_distribution_by_role(agents)
+    gini_equal = aggregator.compute_gini_coefficient(equal_agents)
+    assert gini_equal < 0.1, f"Expected Gini near 0 for equal distribution, got {gini_equal}"
     
-    assert "king" in distribution
-    assert "knight" in distribution
-    assert "mercenary" in distribution
+    # High inequality: one agent has most wealth
+    unequal_agents = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
+        Agent(id="A-02", tape_id=1, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
+        Agent(id="A-03", tape_id=2, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=100, copy=100, defend=100, raid=100, trade=100, sense=100, adapt=100)),
+    ]
     
-    assert distribution["king"]["total"] == 140 + 210  # Sum of king wealth
-    assert distribution["knight"]["total"] == 70
+    gini_unequal = aggregator.compute_gini_coefficient(unequal_agents)
+    assert gini_unequal > 0.5, f"Expected high Gini for unequal distribution, got {gini_unequal}"
 
 
-def test_get_events_by_type():
-    """Test filtering events by type."""
+def test_compute_gini_coefficient_edge_cases():
+    """Test Gini coefficient edge cases."""
+    aggregator = EventAggregator()
+    
+    # Empty list
+    gini_empty = aggregator.compute_gini_coefficient([])
+    assert gini_empty == 0.0
+    
+    # Single agent
+    single_agent = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+    ]
+    gini_single = aggregator.compute_gini_coefficient(single_agent)
+    assert gini_single == 0.0
+    
+    # All zero wealth
+    zero_agents = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=0, copy=0, defend=0, raid=0, trade=0, sense=0, adapt=0)),
+        Agent(id="A-02", tape_id=1, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=0, copy=0, defend=0, raid=0, trade=0, sense=0, adapt=0)),
+    ]
+    gini_zero = aggregator.compute_gini_coefficient(zero_agents)
+    assert gini_zero == 0.0
+
+
+def test_compute_wealth_entropy():
+    """Test wealth entropy computation."""
+    aggregator = EventAggregator()
+    
+    # Equal distribution should have high entropy
+    equal_agents = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+        Agent(id="A-02", tape_id=1, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+        Agent(id="A-03", tape_id=2, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=10, copy=10, defend=10, raid=10, trade=10, sense=10, adapt=10)),
+    ]
+    
+    entropy_equal = aggregator._compute_wealth_entropy(equal_agents)
+    assert entropy_equal > 0, f"Expected positive entropy, got {entropy_equal}"
+    
+    # Unequal distribution should have lower entropy
+    unequal_agents = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
+        Agent(id="A-02", tape_id=1, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=1, copy=1, defend=1, raid=1, trade=1, sense=1, adapt=1)),
+        Agent(id="A-03", tape_id=2, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=100, copy=100, defend=100, raid=100, trade=100, sense=100, adapt=100)),
+    ]
+    
+    entropy_unequal = aggregator._compute_wealth_entropy(unequal_agents)
+    assert entropy_unequal > 0
+    assert entropy_unequal < entropy_equal, "Unequal distribution should have lower entropy"
+
+
+def test_compute_wealth_entropy_edge_cases():
+    """Test wealth entropy edge cases."""
+    aggregator = EventAggregator()
+    
+    # Empty list
+    entropy_empty = aggregator._compute_wealth_entropy([])
+    assert entropy_empty == 0.0
+    
+    # All zero wealth
+    zero_agents = [
+        Agent(id="A-01", tape_id=0, role=Role.KING, currency=100,
+              wealth=WealthTraits(compute=0, copy=0, defend=0, raid=0, trade=0, sense=0, adapt=0)),
+    ]
+    entropy_zero = aggregator._compute_wealth_entropy(zero_agents)
+    assert entropy_zero == 0.0
+
+
+def test_clear():
+    """Test clearing accumulated events."""
     aggregator = EventAggregator()
     
     aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-01"))
-    aggregator.add_event(Event(tick=1, type=EventType.TRADE, king="K-02"))
-    aggregator.add_event(Event(tick=1, type=EventType.BRIBE_ACCEPT, king="K-01", merc="M-01"))
+    aggregator.add_event(Event(tick=1, type=EventType.RETAINER, king="K-01", knight="N-01"))
     
-    trade_events = aggregator.get_events_by_type(EventType.TRADE)
-    assert len(trade_events) == 2
+    assert len(aggregator.events) == 2
     
-    bribe_events = aggregator.get_events_by_type(EventType.BRIBE_ACCEPT)
-    assert len(bribe_events) == 1
+    aggregator.clear()
+    
+    assert len(aggregator.events) == 0
+
+
+def test_set_agents():
+    """Test setting agent list."""
+    aggregator = EventAggregator()
+    
+    agents = [
+        Agent(id="K-01", tape_id=0, role=Role.KING, currency=1000,
+              wealth=WealthTraits(compute=10, copy=15, defend=20, raid=5, trade=10, sense=8, adapt=7)),
+    ]
+    
+    aggregator.set_agents(agents)
+    
+    assert aggregator.agents == agents
 
 
 if __name__ == "__main__":
-    print("Running EventAggregator tests...")
+    # Run all tests
+    print("Running event aggregator tests...")
     
-    test_add_event()
-    print("✓ test_add_event")
+    tests = [
+        ("test_event_aggregator_initialization", test_event_aggregator_initialization),
+        ("test_add_event", test_add_event),
+        ("test_get_tick_summary", test_get_tick_summary),
+        ("test_compute_event_counts", test_compute_event_counts),
+        ("test_compute_currency_flows", test_compute_currency_flows),
+        ("test_compute_wealth_changes", test_compute_wealth_changes),
+        ("test_compute_metrics", test_compute_metrics),
+        ("test_compute_metrics_event_counts", test_compute_metrics_event_counts),
+        ("test_compute_gini_coefficient", test_compute_gini_coefficient),
+        ("test_compute_gini_coefficient_edge_cases", test_compute_gini_coefficient_edge_cases),
+        ("test_compute_wealth_entropy", test_compute_wealth_entropy),
+        ("test_compute_wealth_entropy_edge_cases", test_compute_wealth_entropy_edge_cases),
+        ("test_clear", test_clear),
+        ("test_set_agents", test_set_agents),
+    ]
     
-    test_get_tick_summary()
-    print("✓ test_get_tick_summary")
+    passed = 0
+    failed = 0
     
-    test_currency_flows()
-    print("✓ test_currency_flows")
+    for test_name, test_func in tests:
+        try:
+            test_func()
+            print(f"✓ {test_name} passed")
+            passed += 1
+        except Exception as e:
+            print(f"✗ {test_name} failed: {e}")
+            import traceback
+            traceback.print_exc()
+            failed += 1
     
-    test_wealth_changes()
-    print("✓ test_wealth_changes")
-    
-    test_compute_metrics()
-    print("✓ test_compute_metrics")
-    
-    test_compute_entropy()
-    print("✓ test_compute_entropy")
-    
-    test_compute_gini_coefficient()
-    print("✓ test_compute_gini_coefficient")
-    
-    test_get_wealth_distribution_by_role()
-    print("✓ test_get_wealth_distribution_by_role")
-    
-    test_get_events_by_type()
-    print("✓ test_get_events_by_type")
-    
-    print("\nAll tests passed!")
+    print(f"\n{passed} tests passed, {failed} tests failed")

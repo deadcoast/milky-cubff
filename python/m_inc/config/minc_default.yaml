@@ -1,84 +1,99 @@
 # M|inc Default Configuration
-# Version: 0.1.1
+# Version 0.1.1
+# This configuration provides standard parameters for M|inc economic simulation
 
 version: "0.1.1"
 seed: 1337
 
-# Role assignment and initialization
+# Role assignment configuration
 roles:
   ratios:
-    king: 0.10        # 10% of agents are kings
-    knight: 0.20      # 20% of agents are knights
-    mercenary: 0.70   # 70% of agents are mercenaries
-  mutation_rate: 0.0  # Probability of role mutation per tick (0 = disabled)
+    king: 0.10      # 10% of agents are Kings
+    knight: 0.20    # 20% of agents are Knights
+    mercenary: 0.70 # 70% of agents are Mercenaries
+  mutation_rate: 0.0  # Probability of role change per tick (0 = disabled)
+  
+  # Initial currency ranges by role
+  initial_currency:
+    king: [5000, 7000]
+    knight: [100, 300]
+    mercenary: [0, 50]
 
 # Economic parameters
 economic:
-  # Currency to wealth conversion
+  # Currency to wealth conversion ratio
   currency_to_wealth_ratio: [100, 5]  # 100 currency = 5 wealth units
   
-  # Bribe leakage (successful bribes only)
-  bribe_leakage: 0.05  # 5% wealth leakage on successful bribe
+  # Bribe mechanism parameters
+  bribe_leakage: 0.05  # 5% wealth leakage when bribe succeeds
   
-  # Exposure factors (for raid value calculation)
+  # Wealth exposure factors by role
   exposure_factors:
     king: 1.0
     knight: 0.5
     mercenary: 0.4
   
-  # Raid value weights
+  # Raid value calculation weights
   raid_value_weights:
-    alpha_raid: 1.0           # Weight for merc.raid
-    beta_sense_adapt: 0.25    # Weight for merc.(sense+adapt)
-    gamma_king_defend: 0.60   # Weight for king's defense projection
-    delta_king_exposed: 0.40  # Weight for king's exposed wealth
+    alpha_raid: 1.0          # Weight for mercenary raid trait
+    beta_sense_adapt: 0.25   # Weight for mercenary sense+adapt
+    gamma_king_defend: 0.60  # Weight for king defense projection
+    delta_king_exposed: 0.40 # Weight for king exposed wealth
   
   # Defend resolution parameters
   defend_resolution:
-    base_knight_winrate: 0.50         # Base probability of knight winning
-    trait_advantage_weight: 0.30      # Sigmoid input multiplier for trait delta
-    employment_bonus: 0.08            # Bonus for employed knights (+8% win chance)
-    clamp_min: 0.05                   # Minimum win probability
-    clamp_max: 0.95                   # Maximum win probability
-    stake_currency_frac: 0.10         # Stake as fraction of combined currency
+    base_knight_winrate: 0.50      # Base probability of knight victory
+    trait_advantage_weight: 0.30   # Weight for trait delta in sigmoid
+    clamp_min: 0.05                # Minimum win probability
+    clamp_max: 0.95                # Maximum win probability
+    stake_currency_frac: 0.10      # Stake as fraction of combined currency
+    bounty_frac: 0.07              # Bounty as fraction of merc traits
   
-  # Trade parameters (kings only)
+  # Trade operation parameters
   trade:
-    invest_per_tick: 100              # Currency investment per trade
-    created_wealth_units: 5           # Total wealth units created
+    invest_per_tick: 100      # Currency cost per trade
+    created_wealth_units: 5   # Total wealth units created
     distribution:
-      defend: 3                       # Wealth units to defend trait
-      trade: 2                        # Wealth units to trade trait
+      defend: 3               # Wealth units to defend trait
+      trade: 2                # Wealth units to trade trait
   
-  # Failed bribe / raid success losses
+  # Retainer payment parameters
+  retainer:
+    default_fee: 50           # Default retainer payment per tick
+  
+  # Failed bribe consequences
   on_failed_bribe:
-    king_currency_loss_frac: 0.50     # King loses 50% currency
-    king_wealth_loss_frac: 0.25       # King loses 25% wealth per trait
+    king_currency_loss_frac: 0.50  # 50% currency loss for king
+    king_wealth_loss_frac: 0.25    # 25% wealth loss for king
 
 # Refractory periods (in ticks)
 refractory:
-  raid: 2      # Cooldown after raid attempt
-  defend: 1    # Cooldown after defend
-  bribe: 1     # Cooldown after bribe
-  trade: 0     # No cooldown for trade
+  raid: 2     # Cooldown after raid event
+  defend: 1   # Cooldown after defend event
+  bribe: 1    # Cooldown after bribe event
+  trade: 0    # No cooldown for trade events
 
 # Cache configuration
 cache:
-  enabled: true                # Enable caching of deterministic outcomes
-  max_size: 10000             # Maximum cache entries
-  witness_sample_rate: 0.05   # Sample 5% of cache writes for validation
+  enabled: true              # Enable caching of deterministic outcomes
+  max_size: 10000           # Maximum number of cached states
+  witness_sample_rate: 0.05 # Store 5% of cache writes as witnesses
+  validation_interval: 100  # Validate cache every N ticks
 
 # Output configuration
 output:
-  json_ticks: true            # Write per-tick JSON snapshots
-  csv_events: true            # Write CSV event log
-  csv_final_agents: true      # Write final agent state CSV
-  compress: false             # Compress JSON output (gzip)
+  json_ticks: true          # Write per-tick JSON snapshots
+  csv_events: true          # Write CSV event log
+  csv_final_agents: true    # Write final agent state CSV
+  compress: false           # Disable compression for readability
+  pretty_print: true        # Pretty-print JSON output
 
 # Trait emergence rules
 trait_emergence:
   enabled: true
   rules:
-    - condition: "copy >= 12 AND tick % 2 == 0"
+    - name: "copy_drip"
+      condition: "copy >= 12 AND tick % 2 == 0"
       delta:
         copy: 1
+      description: "Agents with copy >= 12 gain +1 copy every 2 ticks"
