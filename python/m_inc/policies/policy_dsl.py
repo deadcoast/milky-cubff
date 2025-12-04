@@ -1,30 +1,29 @@
-"""Policy DSL Compiler for M|inc economic rules.
+"""Policy DSL Compiler for M|inc.
 
-This module provides a compiler that transforms YAML policy definitions
-into executable Python callables. Policies define economic rules like
-raid_value, p_knight_win, bribe_outcome, and trade_action.
+This module compiles YAML policy definitions into executable Python functions.
+Policies define economic behaviors (bribe outcomes, raid values, etc.) using
+declarative formulas that can be hot-swapped without code changes.
 """
 
 import ast
+import operator
 import math
 from dataclasses import dataclass
-from typing import Dict, Any, Callable, List, Optional
-import yaml
-from pathlib import Path
+from typing import Dict, Any, Callable, List, Optional, Union
+from ..core.models import Agent
+from ..core.economics import (
+    BribeOutcome, DefendOutcome, sigmoid, clamp,
+    wealth_total, wealth_exposed, king_defend_projection
+)
 
 
-class PolicyError(Exception):
-    """Base exception for policy-related errors."""
+class PolicyValidationError(Exception):
+    """Raised when policy validation fails."""
     pass
 
 
-class ValidationError(PolicyError):
-    """Policy validation failed."""
-    pass
-
-
-class CompilationError(PolicyError):
-    """Policy compilation failed."""
+class PolicyCompilationError(Exception):
+    """Raised when policy compilation fails."""
     pass
 
 
@@ -36,686 +35,522 @@ class CompiledPolicies:
         bribe_outcome: Function to compute bribe outcome
         raid_value: Function to compute raid value
         p_knight_win: Function to compute knight win probability
-        trade_action: Function to compute trade action outcome
-        name: Policy name
-        version: Policy version
-        parameters: Policy parameters
+        trade_action: Function to compute trade outcome
     """
     bribe_outcome: Callable
     raid_value: Callable
     p_knight_win: Callable
     trade_action: Callable
-    name: str = "default"
-    version: str = "1.0.0"
-    parameters: Dict[str, Any] = None
-    
-    def __post_init__(self):
-        if self.parameters is None:
-            self.parameters = {}
 
 
 class PolicyCompiler:
-    """Compiler for Policy DSL.
+    """Compiler for YAML-based policy definitions.
     
-    Transforms YAML policy definitions into executable Python functions.
-    Validates syntax and ensures policies are pure (no side effects).
+    The PolicyCompiler parses YAML policy configurations and generates
+    pure Python callable functions. This enables hot-swapping economic
+    policies without modifying code.
+    
+    Example YAML policy:
+        policies:
+          raid_value:
+            formula: "alpha*merc.raid + beta*(merc.sense+merc.adapt) - gamma*king_defend + delta*king_exposed"
+            params:
+              alpha: 1.0
+              beta: 0.25
+              gamma: 0.60
+              delta: 0.40
     """
     
+    # Safe operators allowed in formulas
+    SAFE_OPERATORS = {
+        ast.Add: operator.add,
+        ast.Sub: operator.sub,
+        ast.Mult: operator.mul,
+        ast.Div: operator.truediv,
+        ast.Pow: operator.pow,
+        ast.USub: operator.neg,
+        ast.UAdd: operator.pos,
+    }
+    
+    # Safe functions allowed in formulas
+    SAFE_FUNCTIONS = {
+        'abs': abs,
+        'min': min,
+        'max': max,
+        'sigmoid': sigmoid,
+        'clamp': clamp,
+        'sqrt': math.sqrt,
+        'exp': math.exp,
+        'log': math.log,
+        'wealth_total': wealth_total,
+        'wealth_exposed': wealth_exposed,
+        'king_defend_projection': king_defend_projection,
+    }
+    
     def __init__(self, yaml_config: Dict[str, Any]):
-        """Initialize compiler with YAML configuration.
+        """Initialize the policy compiler.
         
         Args:
-            yaml_config: Dictionary containing policy definition
+            yaml_config: YAML configuration dictionary containing policy definitions
         """
-        self.yaml_config = yaml_config
-        self.policy_data = yaml_config.get('policy', {})
-        self.parameters = self.policy_data.get('parameters', {})
-        self.functions = self.policy_data.get('functions', {})
-        self.name = self.policy_data.get('name', 'default')
-        self.version = self.policy_data.get('version', '1.0.0')
-        
-        # Safe built-in functions allowed in formulas
-        self.safe_builtins = {
-            'abs': abs,
-            'min': min,
-            'max': max,
-            'round': round,
-            'int': int,
-            'float': float,
-            'sum': sum,
-            'len': len,
-            'sigmoid': self._sigmoid,
-            'clamp': self._clamp,
-        }
-    
-    @staticmethod
-    def _sigmoid(x: float) -> float:
-        """Sigmoid function for use in formulas."""
-        try:
-            return 1.0 / (1.0 + math.exp(-x))
-        except OverflowError:
-            return 0.0 if x < 0 else 1.0
-    
-    @staticmethod
-    def _clamp(value: float, min_val: float, max_val: float) -> float:
-        """Clamp function for use in formulas."""
-        return max(min_val, min(max_val, value))
-    
-    @classmethod
-    def from_file(cls, path: Path | str) -> 'PolicyCompiler':
-        """Create compiler from YAML file.
-        
-        Args:
-            path: Path to YAML policy file
-            
-        Returns:
-            PolicyCompiler instance
-        """
-        path = Path(path)
-        if not path.exists():
-            raise FileNotFoundError(f"Policy file not found: {path}")
-        
-        with open(path, 'r') as f:
-            yaml_config = yaml.safe_load(f)
-        
-        return cls(yaml_config)
+        self.config = yaml_config
+        self.policies = yaml_config.get('policies', {})
+        self.validation_errors: List[str] = []
     
     def validate(self) -> List[str]:
-        """Validate policy syntax and structure.
+        """Validate policy syntax and semantics.
         
         Returns:
             List of validation error messages (empty if valid)
         """
         errors = []
         
-        # Check for policy root key
-        if 'policy' not in self.yaml_config:
-            errors.append("Missing 'policy' root key")
-            return errors
+        # Check that required policies are present
+        required_policies = ['raid_value', 'bribe_outcome', 'p_knight_win', 'trade_action']
+        for policy_name in required_policies:
+            if policy_name not in self.policies:
+                errors.append(f"Missing required policy: {policy_name}")
         
-        # Check for functions
-        if not self.functions:
-            errors.append("No functions defined in policy")
+        # Validate each policy
+        for policy_name, policy_def in self.policies.items():
+            policy_errors = self._validate_policy(policy_name, policy_def)
+            errors.extend(policy_errors)
         
-        # Validate each function
-        required_functions = ['raid_value', 'p_knight_win', 'bribe_outcome', 'trade_action']
-        for func_name in required_functions:
-            if func_name not in self.functions:
-                errors.append(f"Missing required function: {func_name}")
-        
-        # Validate function definitions
-        for func_name, func_def in self.functions.items():
-            if not isinstance(func_def, dict):
-                errors.append(f"Function {func_name} must be a dictionary")
-                continue
-            
-            # Check for formula or conditions
-            if 'formula' not in func_def and 'conditions' not in func_def:
-                errors.append(f"Function {func_name} missing 'formula' or 'conditions'")
-            
-            # Validate formula syntax if present
-            if 'formula' in func_def:
-                formula_errors = self._validate_formula(func_def['formula'], func_name)
-                errors.extend(formula_errors)
-        
-        # Validate parameters are numeric
-        for param_name, param_value in self.parameters.items():
-            if not isinstance(param_value, (int, float)):
-                errors.append(f"Parameter {param_name} must be numeric, got {type(param_value)}")
-        
+        self.validation_errors = errors
         return errors
     
-    def _validate_formula(self, formula: str, func_name: str) -> List[str]:
-        """Validate a formula string.
+    def _validate_policy(self, name: str, definition: Dict[str, Any]) -> List[str]:
+        """Validate a single policy definition.
         
         Args:
-            formula: Formula string to validate
-            func_name: Name of function (for error messages)
+            name: Policy name
+            definition: Policy definition dictionary
             
         Returns:
             List of validation errors
         """
         errors = []
         
-        if not formula or not isinstance(formula, str):
-            errors.append(f"Function {func_name}: Formula must be a non-empty string")
+        # trade_action is parameter-based only, doesn't need formula/condition
+        if name == 'trade_action':
+            if 'params' not in definition:
+                errors.append(f"Policy '{name}' missing 'params'")
             return errors
         
-        try:
-            # Parse formula into AST
-            tree = ast.parse(formula, mode='eval')
-            
-            # Check for unsafe operations
-            for node in ast.walk(tree):
-                # Disallow imports
-                if isinstance(node, (ast.Import, ast.ImportFrom)):
-                    errors.append(f"Function {func_name}: Imports not allowed in formulas")
-                
-                # Disallow function calls except safe builtins
-                if isinstance(node, ast.Call):
-                    if isinstance(node.func, ast.Name):
-                        if node.func.id not in self.safe_builtins:
-                            errors.append(
-                                f"Function {func_name}: Unsafe function call: {node.func.id}"
-                            )
-                    # Disallow attribute calls (e.g., obj.method())
-                    elif isinstance(node.func, ast.Attribute):
-                        errors.append(
-                            f"Function {func_name}: Method calls not allowed in formulas"
-                        )
-                
-                # Disallow assignments
-                if isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
-                    errors.append(f"Function {func_name}: Assignments not allowed in formulas")
-                
-                # Disallow del statements
-                if isinstance(node, ast.Delete):
-                    errors.append(f"Function {func_name}: Delete statements not allowed in formulas")
-                
-                # Disallow exec/eval
-                if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
-                    if node.func.id in ('exec', 'eval', 'compile', '__import__'):
-                        errors.append(f"Function {func_name}: {node.func.id} not allowed in formulas")
+        # Check for formula or condition
+        if 'formula' not in definition and 'condition' not in definition:
+            errors.append(f"Policy '{name}' missing 'formula' or 'condition'")
+            return errors
         
-        except SyntaxError as e:
-            errors.append(f"Function {func_name}: Syntax error in formula: {e}")
-        except Exception as e:
-            errors.append(f"Function {func_name}: Validation error: {e}")
+        # Validate formula syntax if present
+        if 'formula' in definition:
+            formula = definition['formula']
+            try:
+                self._parse_formula(formula)
+            except SyntaxError as e:
+                errors.append(f"Policy '{name}' has invalid formula syntax: {e}")
+            except Exception as e:
+                errors.append(f"Policy '{name}' formula validation failed: {e}")
+        
+        # Validate condition syntax if present
+        if 'condition' in definition:
+            condition = definition['condition']
+            try:
+                self._parse_formula(condition)
+            except SyntaxError as e:
+                errors.append(f"Policy '{name}' has invalid condition syntax: {e}")
+            except Exception as e:
+                errors.append(f"Policy '{name}' condition validation failed: {e}")
         
         return errors
     
-    def compile(self) -> CompiledPolicies:
-        """Compile policy into executable functions.
+    def _parse_formula(self, formula: str) -> ast.Expression:
+        """Parse a formula string into an AST.
         
+        Args:
+            formula: Formula string to parse
+            
         Returns:
-            CompiledPolicies with callable functions
+            Parsed AST expression
             
         Raises:
-            ValidationError: If policy validation fails
-            CompilationError: If compilation fails
+            SyntaxError: If formula has invalid syntax
+            PolicyValidationError: If formula contains unsafe operations
+        """
+        try:
+            tree = ast.parse(formula, mode='eval')
+        except SyntaxError as e:
+            raise SyntaxError(f"Invalid formula syntax: {e}")
+        
+        # Validate that only safe operations are used
+        self._validate_ast_safety(tree)
+        
+        return tree
+    
+    def _validate_ast_safety(self, node: ast.AST) -> None:
+        """Validate that an AST only contains safe operations.
+        
+        Args:
+            node: AST node to validate
+            
+        Raises:
+            PolicyValidationError: If unsafe operations are found
+        """
+        if isinstance(node, ast.Expression):
+            self._validate_ast_safety(node.body)
+        elif isinstance(node, ast.BinOp):
+            if type(node.op) not in self.SAFE_OPERATORS:
+                raise PolicyValidationError(f"Unsafe operator: {type(node.op).__name__}")
+            self._validate_ast_safety(node.left)
+            self._validate_ast_safety(node.right)
+        elif isinstance(node, ast.UnaryOp):
+            if type(node.op) not in self.SAFE_OPERATORS:
+                raise PolicyValidationError(f"Unsafe unary operator: {type(node.op).__name__}")
+            self._validate_ast_safety(node.operand)
+        elif isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name):
+                if node.func.id not in self.SAFE_FUNCTIONS:
+                    raise PolicyValidationError(f"Unsafe function: {node.func.id}")
+            else:
+                raise PolicyValidationError("Only simple function calls are allowed")
+            for arg in node.args:
+                self._validate_ast_safety(arg)
+        elif isinstance(node, ast.Attribute):
+            self._validate_ast_safety(node.value)
+        elif isinstance(node, ast.Name):
+            # Variable names are safe
+            pass
+        elif isinstance(node, ast.Constant):
+            # Constants are safe
+            pass
+        elif isinstance(node, ast.Compare):
+            # Comparisons are safe
+            self._validate_ast_safety(node.left)
+            for comparator in node.comparators:
+                self._validate_ast_safety(comparator)
+        elif isinstance(node, ast.BoolOp):
+            # Boolean operations are safe
+            for value in node.values:
+                self._validate_ast_safety(value)
+        else:
+            raise PolicyValidationError(f"Unsafe AST node type: {type(node).__name__}")
+    
+    def compile(self) -> CompiledPolicies:
+        """Compile policies into callable functions.
+        
+        Returns:
+            CompiledPolicies with all policy functions
+            
+        Raises:
+            PolicyCompilationError: If compilation fails
         """
         # Validate first
         errors = self.validate()
         if errors:
-            raise ValidationError(f"Policy validation failed:\n" + "\n".join(errors))
+            raise PolicyCompilationError(f"Policy validation failed: {errors}")
         
+        # Compile each policy
         try:
-            # Compile each function
-            bribe_outcome = self._compile_bribe_outcome()
-            raid_value = self._compile_raid_value()
-            p_knight_win = self._compile_p_knight_win()
-            trade_action = self._compile_trade_action()
-            
-            return CompiledPolicies(
-                bribe_outcome=bribe_outcome,
-                raid_value=raid_value,
-                p_knight_win=p_knight_win,
-                trade_action=trade_action,
-                name=self.name,
-                version=self.version,
-                parameters=self.parameters.copy()
-            )
-        
+            bribe_outcome_fn = self._compile_bribe_outcome()
+            raid_value_fn = self._compile_raid_value()
+            p_knight_win_fn = self._compile_p_knight_win()
+            trade_action_fn = self._compile_trade_action()
         except Exception as e:
-            raise CompilationError(f"Policy compilation failed: {e}") from e
-    
-    def test_compiled_policies(self, compiled: CompiledPolicies, test_agents: Dict[str, Any], 
-                               config: Any) -> Dict[str, Any]:
-        """Test compiled policies against known inputs.
+            raise PolicyCompilationError(f"Policy compilation failed: {e}")
         
-        Args:
-            compiled: CompiledPolicies to test
-            test_agents: Dictionary with test agent instances
-            config: Configuration object
-            
-        Returns:
-            Dictionary with test results
-        """
-        results = {
-            'passed': True,
-            'tests': {},
-            'errors': []
-        }
-        
-        try:
-            # Test raid_value
-            if 'merc' in test_agents and 'king' in test_agents:
-                rv = compiled.raid_value(
-                    test_agents['merc'], 
-                    test_agents['king'], 
-                    test_agents.get('knights', []), 
-                    config
-                )
-                results['tests']['raid_value'] = {
-                    'result': rv,
-                    'type': type(rv).__name__,
-                    'valid': isinstance(rv, (int, float)) and rv >= 0
-                }
-                if not results['tests']['raid_value']['valid']:
-                    results['passed'] = False
-                    results['errors'].append('raid_value returned invalid result')
-            
-            # Test p_knight_win
-            if 'knight' in test_agents and 'merc' in test_agents:
-                p = compiled.p_knight_win(
-                    test_agents['knight'],
-                    test_agents['merc'],
-                    config
-                )
-                results['tests']['p_knight_win'] = {
-                    'result': p,
-                    'type': type(p).__name__,
-                    'valid': isinstance(p, (int, float)) and 0.0 <= p <= 1.0
-                }
-                if not results['tests']['p_knight_win']['valid']:
-                    results['passed'] = False
-                    results['errors'].append('p_knight_win returned invalid probability')
-            
-            # Test bribe_outcome
-            if 'king' in test_agents and 'merc' in test_agents:
-                outcome = compiled.bribe_outcome(
-                    test_agents['king'],
-                    test_agents['merc'],
-                    test_agents.get('knights', []),
-                    config,
-                    compiled.raid_value
-                )
-                results['tests']['bribe_outcome'] = {
-                    'result': outcome,
-                    'valid': isinstance(outcome, dict) and 'accepted' in outcome
-                }
-                if not results['tests']['bribe_outcome']['valid']:
-                    results['passed'] = False
-                    results['errors'].append('bribe_outcome returned invalid result')
-            
-            # Test trade_action
-            if 'king' in test_agents:
-                outcome = compiled.trade_action(test_agents['king'], config)
-                results['tests']['trade_action'] = {
-                    'result': outcome,
-                    'valid': isinstance(outcome, dict) and 'success' in outcome
-                }
-                if not results['tests']['trade_action']['valid']:
-                    results['passed'] = False
-                    results['errors'].append('trade_action returned invalid result')
-        
-        except Exception as e:
-            results['passed'] = False
-            results['errors'].append(f'Test execution failed: {e}')
-        
-        return results
-    
-    def verify_determinism(self, compiled: CompiledPolicies, test_agents: Dict[str, Any],
-                          config: Any, iterations: int = 10) -> Dict[str, Any]:
-        """Verify that compiled policies are deterministic.
-        
-        Args:
-            compiled: CompiledPolicies to test
-            test_agents: Dictionary with test agent instances
-            config: Configuration object
-            iterations: Number of times to run each function
-            
-        Returns:
-            Dictionary with determinism test results
-        """
-        results = {
-            'deterministic': True,
-            'functions': {},
-            'errors': []
-        }
-        
-        try:
-            # Test raid_value determinism
-            if 'merc' in test_agents and 'king' in test_agents:
-                values = []
-                for _ in range(iterations):
-                    rv = compiled.raid_value(
-                        test_agents['merc'],
-                        test_agents['king'],
-                        test_agents.get('knights', []),
-                        config
-                    )
-                    values.append(rv)
-                
-                all_equal = all(v == values[0] for v in values)
-                results['functions']['raid_value'] = {
-                    'deterministic': all_equal,
-                    'values': values[:3]  # Store first 3 for inspection
-                }
-                if not all_equal:
-                    results['deterministic'] = False
-                    results['errors'].append('raid_value is non-deterministic')
-            
-            # Test p_knight_win determinism
-            if 'knight' in test_agents and 'merc' in test_agents:
-                values = []
-                for _ in range(iterations):
-                    p = compiled.p_knight_win(
-                        test_agents['knight'],
-                        test_agents['merc'],
-                        config
-                    )
-                    values.append(p)
-                
-                all_equal = all(v == values[0] for v in values)
-                results['functions']['p_knight_win'] = {
-                    'deterministic': all_equal,
-                    'values': values[:3]
-                }
-                if not all_equal:
-                    results['deterministic'] = False
-                    results['errors'].append('p_knight_win is non-deterministic')
-            
-            # Test bribe_outcome determinism
-            if 'king' in test_agents and 'merc' in test_agents:
-                outcomes = []
-                for _ in range(iterations):
-                    outcome = compiled.bribe_outcome(
-                        test_agents['king'],
-                        test_agents['merc'],
-                        test_agents.get('knights', []),
-                        config,
-                        compiled.raid_value
-                    )
-                    outcomes.append(outcome)
-                
-                # Compare outcomes (convert to string for comparison)
-                all_equal = all(str(o) == str(outcomes[0]) for o in outcomes)
-                results['functions']['bribe_outcome'] = {
-                    'deterministic': all_equal,
-                    'sample': outcomes[0]
-                }
-                if not all_equal:
-                    results['deterministic'] = False
-                    results['errors'].append('bribe_outcome is non-deterministic')
-            
-            # Test trade_action determinism
-            if 'king' in test_agents:
-                outcomes = []
-                for _ in range(iterations):
-                    outcome = compiled.trade_action(test_agents['king'], config)
-                    outcomes.append(outcome)
-                
-                all_equal = all(str(o) == str(outcomes[0]) for o in outcomes)
-                results['functions']['trade_action'] = {
-                    'deterministic': all_equal,
-                    'sample': outcomes[0]
-                }
-                if not all_equal:
-                    results['deterministic'] = False
-                    results['errors'].append('trade_action is non-deterministic')
-        
-        except Exception as e:
-            results['deterministic'] = False
-            results['errors'].append(f'Determinism test failed: {e}')
-        
-        return results
+        return CompiledPolicies(
+            bribe_outcome=bribe_outcome_fn,
+            raid_value=raid_value_fn,
+            p_knight_win=p_knight_win_fn,
+            trade_action=trade_action_fn
+        )
     
     def _compile_raid_value(self) -> Callable:
-        """Compile raid_value function from policy definition.
+        """Compile raid_value policy into a callable function.
         
         Returns:
             Callable that computes raid value
         """
-        func_def = self.functions.get('raid_value', {})
+        policy_def = self.policies['raid_value']
+        formula = policy_def['formula']
+        params = policy_def.get('params', {})
         
-        if 'formula' in func_def:
-            formula = func_def['formula']
-            params = func_def.get('parameters', {})
+        # Parse formula
+        tree = self._parse_formula(formula)
+        
+        def raid_value_fn(merc: Agent, king: Agent, knights: List[Agent], config: Any) -> float:
+            """Compute raid value using compiled policy."""
+            # Build context with available variables
+            context = {
+                'merc': merc,
+                'king': king,
+                'knights': knights,
+                'config': config,
+                **params,
+                **self.SAFE_FUNCTIONS
+            }
             
-            def raid_value_func(merc, king, knights, config):
-                # Build context for formula evaluation
-                context = {
-                    'merc': merc,
-                    'king': king,
-                    'knights': knights,
-                    'config': config,
-                    **self.safe_builtins,
-                    **params,
-                }
-                
-                # Add computed variables
-                context['king_defend'] = self._compute_king_defend(king, knights, config)
-                context['king_exposed'] = self._compute_king_exposed(king, config)
-                
-                # Evaluate formula
-                result = eval(formula, {"__builtins__": {}}, context)
-                return max(0.0, float(result))
+            # Add computed values
+            context['king_defend'] = king_defend_projection(king, knights, 1, config)
+            context['king_exposed'] = wealth_exposed(king, config)
             
-            return raid_value_func
+            # Evaluate formula
+            result = self._eval_ast(tree.body, context)
+            return max(0.0, float(result))
         
-        # Fallback to default implementation
-        return self._default_raid_value
-    
-    def _compile_p_knight_win(self) -> Callable:
-        """Compile p_knight_win function from policy definition.
-        
-        Returns:
-            Callable that computes knight win probability
-        """
-        func_def = self.functions.get('p_knight_win', {})
-        
-        if 'formula' in func_def:
-            formula = func_def['formula']
-            params = func_def.get('parameters', {})
-            variables = func_def.get('variables', {})
-            
-            def p_knight_win_func(knight, merc, config):
-                # Build context
-                context = {
-                    'knight': knight,
-                    'merc': merc,
-                    'config': config,
-                    **self.safe_builtins,
-                    **params,
-                }
-                
-                # Evaluate variable definitions
-                for var_name, var_formula in variables.items():
-                    context[var_name] = eval(var_formula, {"__builtins__": {}}, context)
-                
-                # Evaluate main formula
-                result = eval(formula, {"__builtins__": {}}, context)
-                return float(result)
-            
-            return p_knight_win_func
-        
-        # Fallback to default implementation
-        return self._default_p_knight_win
+        return raid_value_fn
     
     def _compile_bribe_outcome(self) -> Callable:
-        """Compile bribe_outcome function from policy definition.
+        """Compile bribe_outcome policy into a callable function.
         
         Returns:
             Callable that computes bribe outcome
         """
-        func_def = self.functions.get('bribe_outcome', {})
+        policy_def = self.policies['bribe_outcome']
+        condition = policy_def.get('condition', '')
+        on_success = policy_def.get('on_success', {})
         
-        if 'conditions' in func_def:
-            conditions = func_def['conditions']
-            
-            def bribe_outcome_func(king, merc, knights, config, raid_value_func):
-                # Compute raid value
-                rv = raid_value_func(merc, king, knights, config)
-                threshold = king.bribe_threshold
-                
-                # Build context
-                context = {
-                    'king': king,
-                    'merc': merc,
-                    'knights': knights,
-                    'config': config,
-                    'raid_value': rv,
-                    'threshold': threshold,
-                    **self.safe_builtins,
-                }
-                
-                # Evaluate conditions
-                for condition in conditions:
-                    if 'if' in condition:
-                        if eval(condition['if'], {"__builtins__": {}}, context):
-                            return self._build_bribe_outcome(condition, rv, threshold)
-                    elif 'else' in condition:
-                        return self._build_bribe_outcome(condition, rv, threshold)
-                
-                # Default: rejected
-                return {'accepted': False, 'reason': 'rejected'}
-            
-            return bribe_outcome_func
+        # Parse condition
+        condition_tree = self._parse_formula(condition) if condition else None
         
-        # Fallback to default implementation
-        return self._default_bribe_outcome
+        def bribe_outcome_fn(king: Agent, merc: Agent, knights: List[Agent], 
+                            config: Any, raid_value: float) -> BribeOutcome:
+            """Compute bribe outcome using compiled policy."""
+            threshold = king.bribe_threshold
+            
+            # Build context
+            context = {
+                'king': king,
+                'merc': merc,
+                'knights': knights,
+                'config': config,
+                'threshold': threshold,
+                'raid_value': raid_value,
+                **self.SAFE_FUNCTIONS
+            }
+            
+            # Evaluate condition
+            if condition_tree:
+                condition_result = self._eval_ast(condition_tree.body, context)
+            else:
+                # Default condition
+                condition_result = threshold >= raid_value and king.currency >= threshold
+            
+            if condition_result:
+                # Parse on_success actions
+                king_currency_delta = self._eval_expression(
+                    on_success.get('king_currency', '-threshold'), context
+                )
+                merc_currency_delta = self._eval_expression(
+                    on_success.get('merc_currency', '+threshold'), context
+                )
+                king_wealth_leakage = float(on_success.get('king_wealth_leakage', 0.05))
+                
+                return BribeOutcome(
+                    accepted=True,
+                    amount=threshold,
+                    king_currency_delta=int(king_currency_delta),
+                    merc_currency_delta=int(merc_currency_delta),
+                    king_wealth_leakage=king_wealth_leakage,
+                    reason="success"
+                )
+            elif threshold >= raid_value:
+                return BribeOutcome(accepted=False, reason="insufficient_funds")
+            else:
+                return BribeOutcome(accepted=False, reason="threshold_too_low")
+        
+        return bribe_outcome_fn
+    
+    def _compile_p_knight_win(self) -> Callable:
+        """Compile p_knight_win policy into a callable function.
+        
+        Returns:
+            Callable that computes knight win probability
+        """
+        policy_def = self.policies['p_knight_win']
+        formula = policy_def.get('formula', '')
+        params = policy_def.get('params', {})
+        
+        # Parse formula
+        tree = self._parse_formula(formula) if formula else None
+        
+        def p_knight_win_fn(knight: Agent, merc: Agent, config: Any) -> float:
+            """Compute knight win probability using compiled policy."""
+            # Build context
+            knight_traits = knight.wealth.defend + knight.wealth.sense + knight.wealth.adapt
+            merc_traits = merc.wealth.raid + merc.wealth.sense + merc.wealth.adapt
+            trait_delta = knight_traits - merc_traits
+            
+            context = {
+                'knight': knight,
+                'merc': merc,
+                'config': config,
+                'trait_delta': trait_delta,
+                'knight_traits': knight_traits,
+                'merc_traits': merc_traits,
+                **params,
+                **self.SAFE_FUNCTIONS
+            }
+            
+            if tree:
+                result = self._eval_ast(tree.body, context)
+            else:
+                # Default formula
+                base = params.get('base', 0.5)
+                weight = params.get('weight', 0.3)
+                result = base + (sigmoid(weight * trait_delta) - 0.5)
+                
+                # Employment bonus
+                if knight.employer:
+                    result += params.get('employment_bonus', 0.25)
+            
+            # Clamp result
+            clamp_min = params.get('clamp_min', 0.05)
+            clamp_max = params.get('clamp_max', 0.95)
+            return clamp(float(result), clamp_min, clamp_max)
+        
+        return p_knight_win_fn
     
     def _compile_trade_action(self) -> Callable:
-        """Compile trade_action function from policy definition.
+        """Compile trade_action policy into a callable function.
         
         Returns:
-            Callable that computes trade action outcome
+            Callable that computes trade outcome
         """
-        func_def = self.functions.get('trade_action', {})
+        policy_def = self.policies['trade_action']
+        params = policy_def.get('params', {})
         
-        if 'conditions' in func_def:
-            conditions = func_def['conditions']
+        def trade_action_fn(king: Agent, config: Any) -> int:
+            """Compute trade outcome using compiled policy."""
+            invest = params.get('invest_per_tick', 100)
             
-            def trade_action_func(king, config):
-                invest_amount = config.trade.get('invest_per_tick', 100)
-                
-                # Build context
-                context = {
-                    'king': king,
-                    'config': config,
-                    'invest_amount': invest_amount,
-                    **self.safe_builtins,
-                }
-                
-                # Evaluate conditions
-                for condition in conditions:
-                    if 'if' in condition:
-                        if eval(condition['if'], {"__builtins__": {}}, context):
-                            return self._build_trade_outcome(condition, invest_amount)
-                    elif 'else' in condition:
-                        return self._build_trade_outcome(condition, invest_amount)
-                
-                # Default: insufficient funds
-                return {'success': False, 'reason': 'insufficient_funds'}
+            if king.currency < invest:
+                return 0
             
-            return trade_action_func
+            # Deduct currency
+            king.add_currency(-invest)
+            
+            # Add wealth according to distribution
+            created = params.get('created_wealth_units', 5)
+            distribution = params.get('distribution', {'defend': 3, 'trade': 2})
+            
+            for trait_name, amount in distribution.items():
+                king.add_wealth(trait_name, amount)
+            
+            return created
         
-        # Fallback to default implementation
-        return self._default_trade_action
+        return trade_action_fn
     
-    def _build_bribe_outcome(self, condition: Dict, rv: float, threshold: int) -> Dict:
-        """Build bribe outcome from condition definition.
+    def _eval_expression(self, expr: str, context: Dict[str, Any]) -> Any:
+        """Evaluate a simple expression string.
         
         Args:
-            condition: Condition dictionary from YAML
-            rv: Computed raid value
-            threshold: King's bribe threshold
+            expr: Expression string (e.g., "-threshold", "+100")
+            context: Variable context
             
         Returns:
-            Dictionary with bribe outcome
+            Evaluated result
         """
-        result = condition.get('result', 'rejected')
-        
-        if result == 'accepted':
-            then_clause = condition.get('then', {})
-            return {
-                'accepted': True,
-                'amount': threshold,
-                'king_currency_delta': eval(str(then_clause.get('king_currency', '-threshold')), 
-                                           {"__builtins__": {}}, 
-                                           {'threshold': threshold}),
-                'merc_currency_delta': eval(str(then_clause.get('merc_currency', '+threshold')),
-                                           {"__builtins__": {}},
-                                           {'threshold': threshold}),
-                'king_wealth_leakage': then_clause.get('king_wealth_leakage', 0.05),
-            }
+        # Handle simple cases
+        if expr.startswith('-'):
+            var_name = expr[1:]
+            if var_name in context:
+                return -context[var_name]
+            else:
+                return -int(var_name)
+        elif expr.startswith('+'):
+            var_name = expr[1:]
+            if var_name in context:
+                return context[var_name]
+            else:
+                return int(var_name)
         else:
-            return {
-                'accepted': False,
-                'reason': result
-            }
+            # Try to parse as formula
+            try:
+                tree = self._parse_formula(expr)
+                return self._eval_ast(tree.body, context)
+            except:
+                # Try as literal
+                try:
+                    return int(expr)
+                except:
+                    return float(expr)
     
-    def _build_trade_outcome(self, condition: Dict, invest_amount: int) -> Dict:
-        """Build trade outcome from condition definition.
+    def _eval_ast(self, node: ast.AST, context: Dict[str, Any]) -> Any:
+        """Evaluate an AST node with given context.
         
         Args:
-            condition: Condition dictionary from YAML
-            invest_amount: Investment amount
+            node: AST node to evaluate
+            context: Variable context
             
         Returns:
-            Dictionary with trade outcome
+            Evaluated result
         """
-        result = condition.get('result', 'insufficient_funds')
-        
-        if result == 'success':
-            then_clause = condition.get('then', {})
-            return {
-                'success': True,
-                'invest': invest_amount,
-                'wealth_created': then_clause.get('king_wealth', {}),
-            }
+        if isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.Name):
+            if node.id in context:
+                return context[node.id]
+            else:
+                raise NameError(f"Undefined variable: {node.id}")
+        elif isinstance(node, ast.Attribute):
+            obj = self._eval_ast(node.value, context)
+            return getattr(obj, node.attr)
+        elif isinstance(node, ast.BinOp):
+            left = self._eval_ast(node.left, context)
+            right = self._eval_ast(node.right, context)
+            op = self.SAFE_OPERATORS[type(node.op)]
+            return op(left, right)
+        elif isinstance(node, ast.UnaryOp):
+            operand = self._eval_ast(node.operand, context)
+            op = self.SAFE_OPERATORS[type(node.op)]
+            return op(operand)
+        elif isinstance(node, ast.Call):
+            func_name = node.func.id if isinstance(node.func, ast.Name) else None
+            if func_name and func_name in context:
+                func = context[func_name]
+                args = [self._eval_ast(arg, context) for arg in node.args]
+                return func(*args)
+            else:
+                raise NameError(f"Undefined function: {func_name}")
+        elif isinstance(node, ast.Compare):
+            left = self._eval_ast(node.left, context)
+            for op, comparator in zip(node.ops, node.comparators):
+                right = self._eval_ast(comparator, context)
+                if isinstance(op, ast.Eq):
+                    if not (left == right):
+                        return False
+                elif isinstance(op, ast.NotEq):
+                    if not (left != right):
+                        return False
+                elif isinstance(op, ast.Lt):
+                    if not (left < right):
+                        return False
+                elif isinstance(op, ast.LtE):
+                    if not (left <= right):
+                        return False
+                elif isinstance(op, ast.Gt):
+                    if not (left > right):
+                        return False
+                elif isinstance(op, ast.GtE):
+                    if not (left >= right):
+                        return False
+                left = right
+            return True
+        elif isinstance(node, ast.BoolOp):
+            if isinstance(node.op, ast.And):
+                result = True
+                for value in node.values:
+                    result = result and self._eval_ast(value, context)
+                    if not result:
+                        return False
+                return result
+            elif isinstance(node, ast.Or):
+                result = False
+                for value in node.values:
+                    result = result or self._eval_ast(value, context)
+                    if result:
+                        return True
+                return result
         else:
-            return {
-                'success': False,
-                'reason': result
-            }
-    
-    # Helper methods for computing derived values
-    
-    def _compute_king_defend(self, king, knights, config) -> float:
-        """Compute king's defensive projection."""
-        if not knights:
-            return 0.0
-        
-        score = sum(
-            k.wealth.defend + 0.5 * k.wealth.sense + 0.5 * k.wealth.adapt
-            for k in knights
-        )
-        return score
-    
-    def _compute_king_exposed(self, king, config) -> float:
-        """Compute king's exposed wealth."""
-        exposure_factor = config.exposure_factors.get(king.role.value, 1.0)
-        return king.wealth_total() * exposure_factor
-    
-    # Default implementations (fallback if not defined in YAML)
-    
-    def _default_raid_value(self, merc, king, knights, config) -> float:
-        """Default raid value implementation."""
-        from ..core.economics import raid_value as default_rv
-        return default_rv(merc, king, knights, config)
-    
-    def _default_p_knight_win(self, knight, merc, config) -> float:
-        """Default p_knight_win implementation."""
-        from ..core.economics import p_knight_win as default_pkw
-        return default_pkw(knight, merc, config)
-    
-    def _default_bribe_outcome(self, king, merc, knights, config, raid_value_func) -> Dict:
-        """Default bribe outcome implementation."""
-        from ..core.economics import resolve_bribe
-        outcome = resolve_bribe(king, merc, knights, config)
-        return {
-            'accepted': outcome.accepted,
-            'amount': outcome.amount,
-            'king_currency_delta': outcome.king_currency_delta,
-            'merc_currency_delta': outcome.merc_currency_delta,
-            'king_wealth_leakage': outcome.king_wealth_leakage,
-            'reason': outcome.reason,
-        }
-    
-    def _default_trade_action(self, king, config) -> Dict:
-        """Default trade action implementation."""
-        invest = config.trade.get('invest_per_tick', 100)
-        
-        if king.currency >= invest:
-            return {
-                'success': True,
-                'invest': invest,
-                'wealth_created': config.trade.get('distribution', {}),
-            }
-        else:
-            return {
-                'success': False,
-                'reason': 'insufficient_funds'
-            }
+            raise ValueError(f"Unsupported AST node type: {type(node).__name__}")

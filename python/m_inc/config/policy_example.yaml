@@ -1,0 +1,117 @@
+# Example Policy DSL Configuration for M|inc
+# This file demonstrates how to define economic policies using YAML
+
+version: "0.1.1"
+seed: 1337
+
+# Policy definitions using DSL
+policies:
+  # Raid value computation
+  # Determines how attractive a king is as a raid target
+  raid_value:
+    formula: "alpha*merc.wealth.raid + beta*(merc.wealth.sense+merc.wealth.adapt) - gamma*king_defend + delta*king_exposed"
+    params:
+      alpha: 1.0
+      beta: 0.25
+      gamma: 0.60
+      delta: 0.40
+
+  # Bribe outcome evaluation
+  # Determines if a king's bribe is accepted
+  bribe_outcome:
+    condition: "threshold >= raid_value and king.currency >= threshold"
+    on_success:
+      king_currency: "-threshold"
+      merc_currency: "+threshold"
+      king_wealth_leakage: 0.05
+
+  # Knight win probability
+  # Computes probability of knight winning a defend contest
+  p_knight_win:
+    formula: "clamp(base + (sigmoid(weight * trait_delta) - 0.5) + (employment_bonus if knight.employer else 0), clamp_min, clamp_max)"
+    params:
+      base: 0.50
+      weight: 0.30
+      employment_bonus: 0.25
+      clamp_min: 0.05
+      clamp_max: 0.95
+
+  # Trade action
+  # Defines how kings invest currency to create wealth
+  trade_action:
+    params:
+      invest_per_tick: 100
+      created_wealth_units: 5
+      distribution:
+        defend: 3
+        trade: 2
+
+# Role configuration
+roles:
+  ratios:
+    king: 0.10
+    knight: 0.20
+    mercenary: 0.70
+  mutation_rate: 0.0
+
+# Economic parameters (used by policies)
+economic:
+  currency_to_wealth_ratio: [100, 5]
+  bribe_leakage: 0.05
+  exposure_factors:
+    king: 1.0
+    knight: 0.5
+    mercenary: 0.4
+  
+  raid_value_weights:
+    alpha_raid: 1.0
+    beta_sense_adapt: 0.25
+    gamma_king_defend: 0.60
+    delta_king_exposed: 0.40
+  
+  defend_resolution:
+    base_knight_winrate: 0.50
+    trait_advantage_weight: 0.30
+    employment_bonus: 0.25
+    clamp_min: 0.05
+    clamp_max: 0.95
+    stake_currency_frac: 0.10
+  
+  trade:
+    invest_per_tick: 100
+    created_wealth_units: 5
+    distribution:
+      defend: 3
+      trade: 2
+  
+  on_failed_bribe:
+    king_currency_loss_frac: 0.50
+    king_wealth_loss_frac: 0.25
+
+# Refractory periods
+refractory:
+  raid: 2
+  defend: 1
+  bribe: 1
+  trade: 0
+
+# Cache configuration
+cache:
+  enabled: true
+  max_size: 10000
+  witness_sample_rate: 0.05
+
+# Output configuration
+output:
+  json_ticks: true
+  csv_events: true
+  csv_final_agents: true
+  compress: false
+
+# Trait emergence rules
+trait_emergence:
+  enabled: true
+  rules:
+    - condition: "copy >= 12 and tick % 2 == 0"
+      delta:
+        copy: 1

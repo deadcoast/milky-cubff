@@ -18,7 +18,6 @@ class Channel(Enum):
     BRIBE = "bribe"
     TRADE = "trade"
     RETAINER = "retainer"
-    TRAIT_DRIP = "trait_drip"
 
 
 @dataclass
@@ -31,11 +30,11 @@ class Signal:
     channel: Channel
     priority: int
     payload: Dict[str, Any]
-    timestamp: int  # tick number
+    timestamp: int
     refractory_until: Optional[int] = None
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary representation."""
+        """Convert signal to dictionary representation."""
         return {
             "channel": self.channel.value,
             "priority": self.priority,
@@ -49,24 +48,23 @@ class Signal:
 class SignalConfig:
     """Configuration for signal processing."""
     refractory: RefractoryConfig = field(default_factory=RefractoryConfig)
-    channel_priorities: Dict[str, int] = field(default_factory=lambda: {
-        "raid": 100,
-        "defend": 100,
-        "bribe": 90,
-        "trade": 50,
-        "retainer": 60,
-        "trait_drip": 10
+    priorities: Dict[str, int] = field(default_factory=lambda: {
+        "raid": 3,
+        "defend": 3,
+        "bribe": 2,
+        "trade": 1,
+        "retainer": 1,
     })
-    enable_queuing: bool = True
-    enable_coalescing: bool = True
 
 
 class SignalProcessor:
-    """Process events and manage refractory periods for event channels.
+    """Process events through channels with refractory periods.
     
     The SignalProcessor routes events to appropriate channels, enforces
     refractory periods to prevent oscillations, and manages event queuing
     during cooldown windows.
+    
+    Requirements: 13.1, 13.2, 13.3, 13.4, 13.5
     """
     
     def __init__(self, config: SignalConfig):
@@ -77,46 +75,41 @@ class SignalProcessor:
         """
         self.config = config
         self._refractory_state: Dict[Channel, int] = {}  # channel -> tick when refractory expires
-        self._event_queue: Dict[Channel, List[Event]] = {channel: [] for channel in Channel}
+        self._queued_events: Dict[Channel, List[Event]] = {channel: [] for channel in Channel}
         self._current_tick: int = 0
     
     def process_events(self, events: List[Event]) -> List[Signal]:
-        """Process events and route them to appropriate channels.
+        """Route events to channels and create signals.
         
-        Events that occur during refractory periods are queued if queuing
-        is enabled, otherwise they are dropped.
+        Events that occur during refractory periods are queued for later
+        processing. Active events are converted to signals with priorities.
         
         Args:
             events: List of events to process
             
         Returns:
-            List of signals that were successfully routed
+            List of signals sorted by priority (highest first)
+            
+        Requirements: 13.1, 13.2, 13.3
         """
         signals = []
         
         for event in events:
             channel = self._event_to_channel(event)
             
-            # Update current tick from event if not set
-            if self._current_tick == 0 and event.tick > 0:
-                self._current_tick = event.tick
-            
             if self.is_channel_active(channel):
                 # Channel is active, create signal
                 signal = self._create_signal(event, channel)
                 signals.append(signal)
                 
-                # Set refractory period for this channel based on current tick
+                # Set refractory period for this channel
                 refractory_ticks = self._get_refractory_period(channel)
                 if refractory_ticks > 0:
-                    # Use event tick if current tick is 0, otherwise use current tick
-                    base_tick = event.tick if self._current_tick == 0 else self._current_tick
-                    self._refractory_state[channel] = base_tick + refractory_ticks
+                    self._refractory_state[channel] = self._current_tick + refractory_ticks
                     signal.refractory_until = self._refractory_state[channel]
             else:
-                # Channel is in refractory period
-                if self.config.enable_queuing:
-                    self._event_queue[channel].append(event)
+                # Channel is in refractory, queue the event
+                self._queued_events[channel].append(event)
         
         # Sort signals by priority (highest first)
         signals.sort(key=lambda s: s.priority, reverse=True)
@@ -126,16 +119,18 @@ class SignalProcessor:
     def update_refractory(self, tick_num: int) -> List[Signal]:
         """Update refractory state and process queued events.
         
-        This should be called at the start of each tick to:
+        This method should be called at the start of each tick to:
         1. Update the current tick number
-        2. Clear expired refractory periods
-        3. Process queued events for channels that are now active
+        2. Check which channels have expired refractory periods
+        3. Process queued events for expired channels
         
         Args:
             tick_num: Current tick number
             
         Returns:
-            List of signals from queued events that can now be processed
+            List of signals from coalesced queued events
+            
+        Requirements: 13.2, 13.4
         """
         self._current_tick = tick_num
         signals = []
@@ -149,18 +144,15 @@ class SignalProcessor:
         # Remove expired refractory states
         for channel in expired_channels:
             del self._refractory_state[channel]
-            
-            # Process queued events for this channel
-            if self._event_queue[channel]:
-                queued_events = self._event_queue[channel]
-                self._event_queue[channel] = []
+        
+        # Process queued events for expired channels
+        for channel in expired_channels:
+            if self._queued_events[channel]:
+                # Coalesce queued events
+                coalesced_events = self._coalesce_events(self._queued_events[channel])
                 
-                # Coalesce if enabled
-                if self.config.enable_coalescing:
-                    queued_events = self._coalesce_events(queued_events)
-                
-                # Process the queued events
-                for event in queued_events:
+                # Create signals from coalesced events
+                for event in coalesced_events:
                     signal = self._create_signal(event, channel)
                     signals.append(signal)
                     
@@ -169,6 +161,9 @@ class SignalProcessor:
                     if refractory_ticks > 0:
                         self._refractory_state[channel] = tick_num + refractory_ticks
                         signal.refractory_until = self._refractory_state[channel]
+                
+                # Clear the queue
+                self._queued_events[channel] = []
         
         # Sort signals by priority
         signals.sort(key=lambda s: s.priority, reverse=True)
@@ -176,13 +171,15 @@ class SignalProcessor:
         return signals
     
     def is_channel_active(self, channel: Channel) -> bool:
-        """Check if a channel is currently active (not in refractory period).
+        """Check if a channel is active (not in refractory period).
         
         Args:
             channel: Channel to check
             
         Returns:
             True if channel is active, False if in refractory period
+            
+        Requirements: 13.2
         """
         if channel not in self._refractory_state:
             return True
@@ -203,40 +200,36 @@ class SignalProcessor:
                 status[channel.value] = None
         return status
     
-    def get_queue_status(self) -> Dict[str, int]:
+    def get_queue_sizes(self) -> Dict[str, int]:
         """Get the number of queued events for each channel.
         
         Returns:
-            Dictionary mapping channel names to queue length
+            Dictionary mapping channel names to queue sizes
         """
-        return {channel.value: len(self._event_queue[channel]) for channel in Channel}
-    
-    def clear_queues(self) -> None:
-        """Clear all queued events."""
-        for channel in Channel:
-            self._event_queue[channel] = []
+        return {channel.value: len(events) for channel, events in self._queued_events.items()}
     
     def _event_to_channel(self, event: Event) -> Channel:
-        """Map an event to its appropriate channel.
+        """Map an event type to its corresponding channel.
         
         Args:
             event: Event to map
             
         Returns:
-            Channel for this event type
+            Channel for the event
         """
-        event_type_to_channel = {
-            EventType.TRAIT_DRIP: Channel.TRAIT_DRIP,
-            EventType.TRADE: Channel.TRADE,
-            EventType.RETAINER: Channel.RETAINER,
+        # Map event types to channels
+        event_channel_map = {
             EventType.BRIBE_ACCEPT: Channel.BRIBE,
             EventType.BRIBE_INSUFFICIENT: Channel.BRIBE,
             EventType.DEFEND_WIN: Channel.DEFEND,
             EventType.DEFEND_LOSS: Channel.DEFEND,
             EventType.UNOPPOSED_RAID: Channel.RAID,
+            EventType.TRADE: Channel.TRADE,
+            EventType.RETAINER: Channel.RETAINER,
+            EventType.TRAIT_DRIP: Channel.TRADE,  # Trait drips use trade channel (no refractory)
         }
         
-        return event_type_to_channel.get(event.type, Channel.RAID)
+        return event_channel_map.get(event.type, Channel.TRADE)
     
     def _create_signal(self, event: Event, channel: Channel) -> Signal:
         """Create a signal from an event.
@@ -246,34 +239,18 @@ class SignalProcessor:
             channel: Channel for the signal
             
         Returns:
-            Signal instance
+            Signal with appropriate priority and payload
         """
-        priority = self.config.channel_priorities.get(channel.value, 50)
+        priority = self.config.priorities.get(channel.value, 1)
         
-        payload = {
-            "event_type": event.type.value,
-            "tick": event.tick,
-        }
-        
-        # Add event-specific fields to payload
-        if event.king:
-            payload["king"] = event.king
-        if event.knight:
-            payload["knight"] = event.knight
-        if event.merc:
-            payload["merc"] = event.merc
-        if event.amount is not None:
-            payload["amount"] = event.amount
-        if event.stake is not None:
-            payload["stake"] = event.stake
-        if event.notes:
-            payload["notes"] = event.notes
+        # Create payload from event data
+        payload = event.to_dict()
         
         return Signal(
             channel=channel,
             priority=priority,
             payload=payload,
-            timestamp=event.tick
+            timestamp=event.tick,
         )
     
     def _get_refractory_period(self, channel: Channel) -> int:
@@ -285,39 +262,51 @@ class SignalProcessor:
         Returns:
             Refractory period in ticks
         """
-        channel_to_config = {
-            Channel.RAID: self.config.refractory.raid,
-            Channel.DEFEND: self.config.refractory.defend,
-            Channel.BRIBE: self.config.refractory.bribe,
-            Channel.TRADE: self.config.refractory.trade,
-            Channel.RETAINER: 0,  # No refractory for retainers
-            Channel.TRAIT_DRIP: 0,  # No refractory for trait drips
-        }
-        
-        return channel_to_config.get(channel, 0)
+        channel_name = channel.value
+        return getattr(self.config.refractory, channel_name, 0)
     
     def _coalesce_events(self, events: List[Event]) -> List[Event]:
-        """Coalesce multiple queued events into a smaller set.
+        """Coalesce queued events when refractory period expires.
         
-        This reduces redundant events by combining similar events.
-        For now, we use a simple strategy: keep only the most recent
-        event of each type for each agent combination.
+        This method processes queued events and applies coalescing logic:
+        - Deduplicates identical events (same type and participants)
+        - Merges events with the same participants, keeping the most recent
+        - Sorts by tick number to maintain temporal ordering
         
         Args:
-            events: List of events to coalesce
+            events: List of queued events
             
         Returns:
-            Coalesced list of events
+            List of coalesced events sorted by tick and priority
+            
+        Requirements: 13.4
         """
         if not events:
             return []
         
-        # Group events by (type, king, knight, merc) tuple
-        event_map: Dict[tuple, Event] = {}
+        # Coalescing strategy:
+        # 1. Group events by a unique key (type + participants)
+        # 2. For each group, keep only the most recent event (highest tick)
+        # 3. Sort final list by tick number to maintain temporal ordering
+        
+        # Create a dictionary to track the most recent event for each unique interaction
+        coalesced: Dict[str, Event] = {}
         
         for event in events:
-            key = (event.type, event.king, event.knight, event.merc)
-            # Keep the most recent event (last one in the list)
-            event_map[key] = event
+            # Create a unique key based on event type and participants
+            key_parts = [event.type.value]
+            if event.king:
+                key_parts.append(f"K:{event.king}")
+            if event.knight:
+                key_parts.append(f"N:{event.knight}")
+            if event.merc:
+                key_parts.append(f"M:{event.merc}")
+            
+            key = "|".join(key_parts)
+            
+            # Keep the most recent event for this key
+            if key not in coalesced or event.tick > coalesced[key].tick:
+                coalesced[key] = event
         
-        return list(event_map.values())
+        # Return coalesced events sorted by tick number
+        return sorted(coalesced.values(), key=lambda e: e.tick)
