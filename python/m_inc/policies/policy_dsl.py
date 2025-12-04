@@ -45,11 +45,11 @@ class CompiledPolicies:
 
 class PolicyCompiler:
     """Compiler for YAML-based policy definitions.
-    
+
     The PolicyCompiler parses YAML policy configurations and generates
     pure Python callable functions. This enables hot-swapping economic
     policies without modifying code.
-    
+
     Example YAML policy:
         policies:
           raid_value:
@@ -59,8 +59,12 @@ class PolicyCompiler:
               beta: 0.25
               gamma: 0.60
               delta: 0.40
+
+    Security Note:
+        Attribute access is restricted to a whitelist to prevent access to
+        dangerous attributes like __class__, __dict__, __init__, etc.
     """
-    
+
     # Safe operators allowed in formulas
     SAFE_OPERATORS = {
         ast.Add: operator.add,
@@ -71,7 +75,7 @@ class PolicyCompiler:
         ast.USub: operator.neg,
         ast.UAdd: operator.pos,
     }
-    
+
     # Safe functions allowed in formulas
     SAFE_FUNCTIONS = {
         'abs': abs,
@@ -85,6 +89,18 @@ class PolicyCompiler:
         'wealth_total': wealth_total,
         'wealth_exposed': wealth_exposed,
         'king_defend_projection': king_defend_projection,
+    }
+
+    # Whitelist of allowed attributes per object type
+    # Only these attributes can be accessed on objects in formulas
+    SAFE_ATTRIBUTES = {
+        # Agent attributes
+        'id', 'role', 'currency', 'employer', 'retainer_fee',
+        'bribe_threshold', 'wealth',
+        # Wealth trait attributes
+        'compute', 'copy', 'defend', 'raid', 'trade', 'sense', 'adapt',
+        # Config attributes (read-only access to specific fields)
+        'stake_frac', 'exposed_frac', 'bribe_leakage',
     }
     
     def __init__(self, yaml_config: Dict[str, Any]):
@@ -189,12 +205,18 @@ class PolicyCompiler:
     
     def _validate_ast_safety(self, node: ast.AST) -> None:
         """Validate that an AST only contains safe operations.
-        
+
         Args:
             node: AST node to validate
-            
+
         Raises:
             PolicyValidationError: If unsafe operations are found
+
+        Security:
+            - Rejects dunder attributes (starting with '_')
+            - Only allows whitelisted attributes from SAFE_ATTRIBUTES
+            - Only allows whitelisted functions from SAFE_FUNCTIONS
+            - Only allows whitelisted operators from SAFE_OPERATORS
         """
         if isinstance(node, ast.Expression):
             self._validate_ast_safety(node.body)
@@ -216,6 +238,23 @@ class PolicyCompiler:
             for arg in node.args:
                 self._validate_ast_safety(arg)
         elif isinstance(node, ast.Attribute):
+            # SECURITY: Validate attribute access against whitelist
+            attr_name = node.attr
+
+            # Block dunder attributes (e.g., __class__, __dict__, __init__)
+            if attr_name.startswith('_'):
+                raise PolicyValidationError(
+                    f"Access to private/dunder attributes not allowed: {attr_name}"
+                )
+
+            # Check against whitelist
+            if attr_name not in self.SAFE_ATTRIBUTES:
+                raise PolicyValidationError(
+                    f"Attribute not in whitelist: {attr_name}. "
+                    f"Allowed: {sorted(self.SAFE_ATTRIBUTES)}"
+                )
+
+            # Recursively validate the object being accessed
             self._validate_ast_safety(node.value)
         elif isinstance(node, ast.Name):
             # Variable names are safe
@@ -478,13 +517,16 @@ class PolicyCompiler:
     
     def _eval_ast(self, node: ast.AST, context: Dict[str, Any]) -> Any:
         """Evaluate an AST node with given context.
-        
+
         Args:
             node: AST node to evaluate
             context: Variable context
-            
+
         Returns:
             Evaluated result
+
+        Security:
+            Runtime enforcement of attribute whitelist as defense-in-depth.
         """
         if isinstance(node, ast.Constant):
             return node.value
@@ -494,8 +536,23 @@ class PolicyCompiler:
             else:
                 raise NameError(f"Undefined variable: {node.id}")
         elif isinstance(node, ast.Attribute):
+            # SECURITY: Runtime check of attribute whitelist (defense-in-depth)
+            attr_name = node.attr
+
+            # Block dunder attributes
+            if attr_name.startswith('_'):
+                raise PolicyValidationError(
+                    f"Access to private/dunder attributes not allowed: {attr_name}"
+                )
+
+            # Check whitelist
+            if attr_name not in self.SAFE_ATTRIBUTES:
+                raise PolicyValidationError(
+                    f"Attribute not in whitelist: {attr_name}"
+                )
+
             obj = self._eval_ast(node.value, context)
-            return getattr(obj, node.attr)
+            return getattr(obj, attr_name)
         elif isinstance(node, ast.BinOp):
             left = self._eval_ast(node.left, context)
             right = self._eval_ast(node.right, context)

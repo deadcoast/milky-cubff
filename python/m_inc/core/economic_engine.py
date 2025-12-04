@@ -1,10 +1,150 @@
 """Economic engine for M|inc tick processing."""
 
-from typing import List
+import ast
+import operator
+from typing import List, Dict, Any
 from .models import Agent, Event, EventType, TickMetrics, TickResult, AgentSnapshot, Role
 from .agent_registry import AgentRegistry
 from .config import EconomicConfig, TraitEmergenceConfig
 from . import economics
+
+
+class SafeExpressionEvaluator:
+    """Safe expression evaluator using AST parsing.
+
+    Only allows:
+    - Numeric literals
+    - Variable lookups from a whitelist
+    - Arithmetic operators (+, -, *, /, //, %, **)
+    - Comparison operators (==, !=, <, <=, >, >=)
+    - Boolean operators (and, or, not)
+
+    Does NOT allow:
+    - Function calls
+    - Attribute access
+    - Subscript access
+    - Lambda expressions
+    - List/dict comprehensions
+    """
+
+    SAFE_BINARY_OPS = {
+        ast.Add: operator.add,
+        ast.Sub: operator.sub,
+        ast.Mult: operator.mul,
+        ast.Div: operator.truediv,
+        ast.FloorDiv: operator.floordiv,
+        ast.Mod: operator.mod,
+        ast.Pow: operator.pow,
+    }
+
+    SAFE_UNARY_OPS = {
+        ast.USub: operator.neg,
+        ast.UAdd: operator.pos,
+        ast.Not: operator.not_,
+    }
+
+    SAFE_COMPARE_OPS = {
+        ast.Eq: operator.eq,
+        ast.NotEq: operator.ne,
+        ast.Lt: operator.lt,
+        ast.LtE: operator.le,
+        ast.Gt: operator.gt,
+        ast.GtE: operator.ge,
+    }
+
+    def __init__(self, allowed_vars: set):
+        """Initialize evaluator with allowed variable names.
+
+        Args:
+            allowed_vars: Set of variable names that can be referenced
+        """
+        self.allowed_vars = allowed_vars
+
+    def evaluate(self, expression: str, context: Dict[str, Any]) -> Any:
+        """Safely evaluate an expression.
+
+        Args:
+            expression: Expression string to evaluate
+            context: Dictionary of variable values
+
+        Returns:
+            Evaluated result
+
+        Raises:
+            ValueError: If expression contains unsafe operations
+            NameError: If expression references undefined variables
+        """
+        try:
+            tree = ast.parse(expression, mode='eval')
+        except SyntaxError as e:
+            raise ValueError(f"Invalid expression syntax: {e}")
+
+        return self._eval_node(tree.body, context)
+
+    def _eval_node(self, node: ast.AST, context: Dict[str, Any]) -> Any:
+        """Recursively evaluate an AST node.
+
+        Args:
+            node: AST node to evaluate
+            context: Variable context
+
+        Returns:
+            Evaluated result
+        """
+        if isinstance(node, ast.Constant):
+            # Allow numeric and boolean constants only
+            if isinstance(node.value, (int, float, bool, type(None))):
+                return node.value
+            raise ValueError(f"Unsupported constant type: {type(node.value)}")
+
+        elif isinstance(node, ast.Name):
+            if node.id not in self.allowed_vars:
+                raise ValueError(f"Variable not allowed: {node.id}")
+            if node.id not in context:
+                raise NameError(f"Undefined variable: {node.id}")
+            return context[node.id]
+
+        elif isinstance(node, ast.BinOp):
+            if type(node.op) not in self.SAFE_BINARY_OPS:
+                raise ValueError(f"Operator not allowed: {type(node.op).__name__}")
+            left = self._eval_node(node.left, context)
+            right = self._eval_node(node.right, context)
+            return self.SAFE_BINARY_OPS[type(node.op)](left, right)
+
+        elif isinstance(node, ast.UnaryOp):
+            if type(node.op) not in self.SAFE_UNARY_OPS:
+                raise ValueError(f"Unary operator not allowed: {type(node.op).__name__}")
+            operand = self._eval_node(node.operand, context)
+            return self.SAFE_UNARY_OPS[type(node.op)](operand)
+
+        elif isinstance(node, ast.Compare):
+            left = self._eval_node(node.left, context)
+            for op, comparator in zip(node.ops, node.comparators):
+                if type(op) not in self.SAFE_COMPARE_OPS:
+                    raise ValueError(f"Comparison not allowed: {type(op).__name__}")
+                right = self._eval_node(comparator, context)
+                if not self.SAFE_COMPARE_OPS[type(op)](left, right):
+                    return False
+                left = right
+            return True
+
+        elif isinstance(node, ast.BoolOp):
+            if isinstance(node.op, ast.And):
+                for value in node.values:
+                    if not self._eval_node(value, context):
+                        return False
+                return True
+            elif isinstance(node.op, ast.Or):
+                for value in node.values:
+                    if self._eval_node(value, context):
+                        return True
+                return False
+            else:
+                raise ValueError(f"Boolean operator not allowed: {type(node.op).__name__}")
+
+        else:
+            # Reject all other node types (Call, Attribute, Subscript, Lambda, etc.)
+            raise ValueError(f"Expression type not allowed: {type(node).__name__}")
 
 
 class EconomicEngine:
@@ -68,25 +208,35 @@ class EconomicEngine:
     
     def _soup_drip(self, tick_num: int) -> List[Event]:
         """Apply trait emergence (soup drip) rules.
-        
+
         Checks trait emergence conditions and applies deltas.
         Default rule: if copy >= 12 and tick is even, increment copy by 1.
-        
+
         Args:
             tick_num: Current tick number
-            
+
         Returns:
             List of trait_drip events
         """
         events: List[Event] = []
-        
+
         if not self.trait_config.enabled:
             return events
-        
+
+        # Define allowed variables for condition evaluation
+        allowed_vars = {
+            "copy", "compute", "defend", "raid", "trade",
+            "sense", "adapt", "tick", "currency"
+        }
+        evaluator = SafeExpressionEvaluator(allowed_vars)
+
         for rule in self.trait_config.rules:
             condition = rule.get("condition", "")
             delta = rule.get("delta", {})
-            
+
+            if not condition:
+                continue
+
             # Parse and evaluate condition for each agent
             for agent in self.registry.get_all_agents():
                 # Build evaluation context
@@ -101,21 +251,14 @@ class EconomicEngine:
                     "tick": tick_num,
                     "currency": agent.currency
                 }
-                
-                # Evaluate condition
+
+                # Evaluate condition safely using AST-based evaluator
                 try:
-                    # Allow basic Python operators in eval
-                    safe_builtins = {
-                        "__builtins__": {},
-                        "True": True,
-                        "False": False,
-                        "None": None
-                    }
-                    if eval(condition, safe_builtins, context):
+                    if evaluator.evaluate(condition, context):
                         # Apply delta
                         for trait_name, amount in delta.items():
                             agent.add_wealth(trait_name, amount)
-                            
+
                             # Record event
                             events.append(Event(
                                 tick=tick_num,
@@ -125,13 +268,14 @@ class EconomicEngine:
                                 delta=amount,
                                 notes=f"drip: {trait_name}+{amount}"
                             ))
-                        
+
                         # Update agent in registry
                         self.registry.update_agent(agent)
-                except Exception:
-                    # Skip invalid conditions
-                    pass
-        
+                except (ValueError, NameError) as e:
+                    # Log and skip invalid/unsafe conditions
+                    import logging
+                    logging.warning(f"Invalid trait emergence condition '{condition}': {e}")
+
         return events
     
     def _execute_trades(self, tick_num: int) -> List[Event]:
