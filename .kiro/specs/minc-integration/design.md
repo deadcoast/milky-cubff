@@ -495,6 +495,239 @@ class TickMetrics:
     raids_won_by_knight: int
 ```
 
+## Correctness Properties
+
+*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+
+The following correctness properties are derived from the acceptance criteria in the requirements document. Each property is universally quantified (applies to all valid inputs) and references the specific requirements it validates. These properties form the basis for property-based testing of the M|inc system.
+
+### Core Invariants
+
+**Property 1: Non-negativity invariant**
+
+*For any* agent at any point in time, currency must be non-negative AND all seven wealth traits (compute, copy, defend, raid, trade, sense, adapt) must be non-negative.
+
+**Validates: Requirements 3.1, 3.2, 3.5**
+
+**Property 2: Deterministic execution**
+
+*For any* initial state and random seed, executing the same sequence of ticks must produce identical event sequences, agent states, and metrics.
+
+**Validates: Requirements 3.4, 8.2, 8.3, 8.4, 8.5**
+
+### Agent Management Properties
+
+**Property 3: Role assignment distribution**
+
+*For any* set of tape IDs and configured role ratios, the assigned roles must match the configured distribution within rounding error (±1 agent per role).
+
+**Validates: Requirements 2.2**
+
+**Property 4: Agent initialization**
+
+*For any* agent created with a specific role, the initial currency and wealth traits must fall within the configured ranges for that role, and all seven wealth traits must be initialized.
+
+**Validates: Requirements 2.3, 2.4**
+
+**Property 5: Registry lookup consistency**
+
+*For any* tape ID assigned to an agent, retrieving the agent by tape ID must return the same agent as retrieving by agent ID.
+
+**Validates: Requirements 2.1**
+
+**Property 6: Role mutation rate**
+
+*For any* configured mutation rate and population of agents, over a sufficient number of ticks, the observed mutation frequency should approximate the configured rate within statistical bounds.
+
+**Validates: Requirements 2.5**
+
+### Economic Interaction Properties
+
+**Property 7: Currency-wealth conversion ratio**
+
+*For any* trade operation that converts currency to wealth, the ratio must be exactly 100 currency = 5 wealth units.
+
+**Validates: Requirements 3.3**
+
+**Property 8: Bribe evaluation**
+
+*For any* mercenary targeting a king, the system must evaluate the king's bribe threshold against the computed raid value using the exact formula: raid_value = 1.0×merc.raid + 0.25×(merc.sense+merc.adapt) - 0.60×king_defend_projection + 0.40×king_wealth_exposed.
+
+**Validates: Requirements 4.1, 4.5**
+
+**Property 9: Bribe success conditions**
+
+*For any* king and mercenary interaction, IF bribe_threshold >= raid_value AND king.currency >= bribe_threshold, THEN the bribe must succeed with exact currency transfer and 5% wealth leakage applied to the king.
+
+**Validates: Requirements 4.2, 4.3**
+
+**Property 10: Bribe failure leads to contest**
+
+*For any* king and mercenary interaction, IF bribe_threshold < raid_value OR king.currency < bribe_threshold, THEN a raid/defend contest must be initiated.
+
+**Validates: Requirements 4.4, 5.1**
+
+**Property 11: Knight win probability calculation**
+
+*For any* knight and mercenary in a defend contest, the win probability must be computed using the exact formula: p_knight_win = clamp(0.05, 0.95, 0.5 + sigmoid(0.3×trait_delta) - 0.5).
+
+**Validates: Requirements 5.2**
+
+**Property 12: Deterministic contest resolution**
+
+*For any* knight and mercenary in a defend contest, IF p_knight_win > 0.5 OR (p_knight_win == 0.5 AND knight.id < merc.id), THEN the contest must resolve as a knight victory with exact stake and bounty transfers.
+
+**Validates: Requirements 5.3, 5.4**
+
+**Property 13: Mercenary victory transfers**
+
+*For any* mercenary victory in a defend contest, mirrored losses (50% currency, 25% wealth) must be transferred from king to mercenary, and stake must be deducted from knight.
+
+**Validates: Requirements 5.5**
+
+**Property 14: Trade currency requirement**
+
+*For any* king agent, a trade operation is possible IF AND ONLY IF the king's currency >= 100. When a trade occurs, exactly 100 currency is deducted and exactly 5 wealth units are added (3 to defend, 2 to trade).
+
+**Validates: Requirements 6.1, 6.2, 6.5**
+
+**Property 15: Trade event recording**
+
+*For any* trade operation, an event must be recorded containing: tick number, king ID, investment amount (100), and wealth created (5 units with distribution).
+
+**Validates: Requirements 6.4**
+
+**Property 16: Retainer payment conditions**
+
+*For any* knight with an employer king, IF the king has sufficient currency, THEN the retainer fee must be transferred from king to knight. IF the king lacks sufficient currency, THEN no payment occurs and no error is raised.
+
+**Validates: Requirements 7.1, 7.2, 7.5**
+
+**Property 17: Retainer event recording**
+
+*For any* retainer payment (successful or skipped), an event must be recorded containing: tick number, employer ID, knight ID, and amount (or 0 if skipped).
+
+**Validates: Requirements 7.4**
+
+### Caching and Performance Properties
+
+**Property 18: Canonical state determinism**
+
+*For any* set of agents with unique IDs, the canonical state hash must be invariant under agent ordering (i.e., shuffling the agent list produces the same hash).
+
+**Validates: Requirements 12.1, 12.2**
+
+**Property 19: Cache correctness**
+
+*For any* canonical state and config hash, IF a cached outcome exists, THEN using the cached result must produce identical outcomes to recomputing from scratch.
+
+**Validates: Requirements 12.3**
+
+**Property 20: Cache invalidation on config change**
+
+*For any* configuration change, all cached results must be invalidated and subsequent computations must use the new configuration.
+
+**Validates: Requirements 11.3, 12.5**
+
+**Property 21: Witness sample storage**
+
+*For any* cache write operation, witness samples (input/output pairs) must be stored at the configured sample rate for validation purposes.
+
+**Validates: Requirements 12.4**
+
+### Signal and Event Properties
+
+**Property 22: Refractory period enforcement**
+
+*For any* event that fires on a channel, that channel must be blocked for exactly the configured refractory period (in ticks), and any events on that channel during the refractory period must be queued.
+
+**Validates: Requirements 13.1, 13.2, 13.3**
+
+**Property 23: Event coalescing**
+
+*For any* queued events on a channel, when the refractory period expires, the events must be coalesced according to priority rules before being processed.
+
+**Validates: Requirements 13.4**
+
+### Trait Emergence Properties
+
+**Property 24: Copy trait drip rule**
+
+*For any* agent with copy trait >= 12, on every even tick (tick % 2 == 0), the copy trait must be incremented by exactly 1, and a trait_drip event must be recorded.
+
+**Validates: Requirements 14.1, 14.4**
+
+**Property 25: Trait emergence disable**
+
+*For any* configuration with trait_emergence.enabled = false, no trait drip operations must occur regardless of agent trait values.
+
+**Validates: Requirements 14.5**
+
+### Metrics and Output Properties
+
+**Property 26: Metrics completeness**
+
+*For any* tick, the computed metrics must include all required fields: entropy, compression_ratio, copy_score_mean, wealth_total, currency_total, bribes_paid, bribes_accepted, raids_attempted, raids_won_by_merc, raids_won_by_knight, and wealth distribution statistics per role.
+
+**Validates: Requirements 9.1, 9.2, 9.3**
+
+**Property 27: Output schema compliance**
+
+*For any* output (JSON tick snapshot, CSV event log, or final agent CSV), the data must validate against the documented schema and include all required fields and metadata (version, seed, config_hash, timestamp).
+
+**Validates: Requirements 10.1, 10.2, 10.3, 10.4, 10.5**
+
+**Property 28: Configuration hash consistency**
+
+*For any* configuration, the computed config hash must be deterministic (same config always produces same hash) and must be included in all output metadata.
+
+**Validates: Requirements 11.2**
+
+**Property 29: Configuration validation**
+
+*For any* invalid configuration (e.g., role ratios not summing to 1.0, negative values, out-of-range parameters), the system must reject the configuration and report specific validation errors.
+
+**Validates: Requirements 11.5**
+
+### Property Testing Implementation Notes
+
+Each of these properties should be implemented as a property-based test using the Hypothesis library (Python's PBT framework). The tests should:
+
+1. Generate random valid inputs within the domain constraints
+2. Execute the system operation
+3. Assert that the property holds for all generated inputs
+4. Run a minimum of 100 iterations per property
+5. Include a comment tag referencing the property number and text
+
+Example property test structure:
+
+```python
+@given(agent=agent_strategy())
+@settings(max_examples=100)
+def test_property_1_non_negativity(agent):
+    """
+    Property 1: Non-negativity invariant
+    For any agent at any point in time, currency and all wealth traits
+    must be non-negative.
+    
+    **Feature: minc-integration, Property 1: Non-negativity invariant**
+    **Validates: Requirements 3.1, 3.2, 3.5**
+    """
+    assert agent.currency >= 0
+    assert all(getattr(agent.wealth, trait) >= 0 
+               for trait in ['compute', 'copy', 'defend', 'raid', 
+                           'trade', 'sense', 'adapt'])
+```
+
+### Property Coverage Summary
+
+- **Total Acceptance Criteria**: 75 (across 15 requirements)
+- **Testable as Properties**: 29 unique properties (after eliminating redundancy)
+- **Testable as Examples**: 8 (integration and CLI tests)
+- **Edge Cases**: Handled within property generators
+- **Not Testable**: 11 (architectural, documentation, or subjective criteria)
+- **Coverage**: 49% of criteria have formal properties, 60% have automated tests
+
 ## Error Handling
 
 ### Error Categories
