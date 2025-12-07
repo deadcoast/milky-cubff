@@ -47,6 +47,8 @@ This includes additional tools for development:
 - ruff: Linting
 - mypy: Type checking
 
+**Quick Start**: See `QUICKSTART.md` for a condensed getting-started guide.
+
 ### Verify installation
 
 ```bash
@@ -890,13 +892,35 @@ mypy m_inc
 mypy m_inc/core/economic_engine.py
 ```
 
+## Directory Structure
+
+```
+python/m_inc/
+├── core/              # Core implementation (models, engine, economics)
+├── adapters/          # BFF integration adapters (trace reader, output writer)
+├── policies/          # Policy DSL compiler
+├── config/            # YAML configuration files
+├── tests/             # All test files (pytest)
+├── scripts/           # Validation and utility scripts
+├── examples/          # Usage examples
+├── testdata/          # Test data and sample traces
+├── cli.py             # Main CLI entry point
+├── README.md          # This file
+├── QUICKSTART.md      # Quick start guide
+├── API.md             # API reference
+└── INTEGRATION.md     # Integration guide
+```
+
 ## Documentation
 
-- [Requirements](../../.kiro/specs/minc-integration/requirements.md)
-- [Design](../../.kiro/specs/minc-integration/design.md)
-- [Implementation Tasks](../../.kiro/specs/minc-integration/tasks.md)
-- [M|inc Overview](../../docs/OVERVIEW.md)
-- [0.1.1 Spec](../../docs/0.1.1/)
+- [Quick Start](QUICKSTART.md) - Get started quickly
+- [API Reference](API.md) - Complete API documentation
+- [Integration Guide](INTEGRATION.md) - BFF integration details
+- [Requirements](../../.kiro/specs/minc-integration/requirements.md) - Formal requirements
+- [Design](../../.kiro/specs/minc-integration/design.md) - Architecture and design
+- [Implementation Tasks](../../.kiro/specs/minc-integration/tasks.md) - Task list
+- [M|inc Overview](../../docs/OVERVIEW.md) - High-level overview
+- [0.1.1 Spec](../../docs/0.1.1/) - Version 0.1.1 specification
 
 ## License
 
