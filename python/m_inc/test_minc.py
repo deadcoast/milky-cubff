@@ -3,8 +3,12 @@
 import sys
 from pathlib import Path
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Note: this is a local smoke test and is not wired into CI. It expects to be
+# executed from the repository root so that the `python/` directory can be
+# added to the module search path.
+repo_root = Path(__file__).resolve().parents[2]
+python_root = repo_root / "python"
+sys.path.insert(0, str(python_root))
 
 from m_inc.core.config import ConfigLoader
 from m_inc.core.agent_registry import AgentRegistry

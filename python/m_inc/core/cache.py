@@ -128,22 +128,26 @@ class CacheStats:
 
 class CacheLayer:
     """Cache layer for memoizing deterministic economic outcomes.
-    
+
     Uses LRU eviction policy and stores witness samples for validation.
     Cache keys are computed from canonical state + config hash.
     """
-    
-    def __init__(self, config: CacheConfig):
-        """Initialize cache layer.
+
+    def __init__(self, config: CacheConfig, seed: Optional[int] = None):
+        """
+        Initialize the cache layer with the provided configuration and an optional seed for reproducible witness sampling.
         
-        Args:
-            config: Cache configuration
+        Sets up the internal LRU cache storage, witness sample store, statistics tracker, and the pseudo-random generator used to decide witness sampling.
+        
+        Parameters:
+            config (CacheConfig): Configuration that controls cache behavior (e.g., max size, enabled flag, witness sampling rate).
+            seed (Optional[int]): Seed for the RNG used for witness sampling. When `None`, a fixed default seed is used to make sampling deterministic across runs.
         """
         self.config = config
         self.cache: OrderedDict[str, Any] = OrderedDict()
         self.witnesses: Dict[str, WitnessSample] = {}
         self.stats = CacheStats()
-        self.rng = random.Random()
+        self.rng = random.Random(1337 if seed is None else seed)
     
     def get_or_compute(
         self,

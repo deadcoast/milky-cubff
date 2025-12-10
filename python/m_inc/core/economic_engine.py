@@ -25,6 +25,11 @@ class SafeExpressionEvaluator:
     - Subscript access
     - Lambda expressions
     - List/dict comprehensions
+    
+    This evaluator is intentionally minimal because trait-emergence and
+    guard-rail expressions live in configuration, not in code. Keeping the
+    allowed surface area small makes policy reviews and PR checks focused on
+    source changes rather than execution side effects.
     """
 
     SAFE_BINARY_OPS = {

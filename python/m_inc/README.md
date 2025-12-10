@@ -6,6 +6,8 @@ Economic incentive layer for CuBFF (CUDA Brainfuck Forth) self-replicating soup 
 
 M|inc extends the BFF experiment by layering economic behaviors on top of the tape-based evolutionary system. Agents are assigned roles (Kings, Knights, Mercenaries) and engage in economic interactions including bribes, raids, defends, trades, and retainers.
 
+The project lives entirely in the `python/m_inc` package so it can evolve independently from the CUDA CuBFF core. Core logic resides under `core/`, adapters for trace I/O live under `adapters/`, and policies and examples live under `policies/` and `examples/` respectively. This separation keeps the economic layer easy to reason about and auditable alongside the source code reviewed in this repository.
+
 ## Features
 
 - **Non-invasive integration**: Separate Python package, no changes to BFF core
@@ -828,7 +830,8 @@ from m_inc.core.cache import CacheLayer, CacheConfig
 
 # Initialize cache
 config = CacheConfig(enabled=True, max_size=10000)
-cache = CacheLayer(config)
+# Seed the witness sampler for reproducible runs
+cache = CacheLayer(config, seed=1337)
 
 # Use cache
 def expensive_computation(state):
@@ -889,6 +892,20 @@ mypy m_inc
 # Check specific module
 mypy m_inc/core/economic_engine.py
 ```
+
+### PR hygiene (manual checks)
+
+The CI pipeline intentionally does not run heavyweight artifact-scrubbing jobs. Before opening or updating a pull request:
+
+- Remove Python bytecode (`__pycache__/`, `*.pyc`) and other generated artifacts from the working tree. A quick sweep is:
+
+  ```bash
+  find python/m_inc -name "__pycache__" -prune -exec rm -rf {} +
+  ```
+
+- Ensure sample outputs in `python/m_inc/test_output/` are up to date and reflect the source of truth.
+- Run the smoke tests locally (`python -m pytest` or `python -m m_inc.test_minc`) because these checks are not enforced in CI.
+- Confirm `git status` is clean before pushing so PR checks only cover source changes, not interpreter caches.
 
 ## Documentation
 
