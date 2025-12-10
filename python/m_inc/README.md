@@ -6,7 +6,7 @@ Economic incentive layer for CuBFF (CUDA Brainfuck Forth) self-replicating soup 
 
 M|inc extends the BFF experiment by layering economic behaviors on top of the tape-based evolutionary system. Agents are assigned roles (Kings, Knights, Mercenaries) and engage in economic interactions including bribes, raids, defends, trades, and retainers.
 
-The project lives entirely in the `python/m_inc` package so it can evolve independently from the CUDA CuBFF core. Core logic resides under `core/`, adapters for trace IO live under `adapters/`, and policies and examples live under `policies/` and `examples/` respectively. This separation keeps the economic layer easy to reason about and auditable alongside the source code reviewed in this repository.
+The project lives entirely in the `python/m_inc` package so it can evolve independently from the CUDA CuBFF core. Core logic resides under `core/`, adapters for trace I/O live under `adapters/`, and policies and examples live under `policies/` and `examples/` respectively. This separation keeps the economic layer easy to reason about and auditable alongside the source code reviewed in this repository.
 
 ## Features
 
