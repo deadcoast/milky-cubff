@@ -48,7 +48,9 @@ class PolicyCompiler:
 
     The PolicyCompiler parses YAML policy configurations and generates
     pure Python callable functions. This enables hot-swapping economic
-    policies without modifying code.
+    policies without modifying code while keeping the execution surface
+    area auditable—every compiled expression is inspected via the AST
+    pipeline before it can run.
 
     Example YAML policy:
         policies:

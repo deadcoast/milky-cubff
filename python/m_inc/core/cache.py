@@ -128,22 +128,23 @@ class CacheStats:
 
 class CacheLayer:
     """Cache layer for memoizing deterministic economic outcomes.
-    
+
     Uses LRU eviction policy and stores witness samples for validation.
     Cache keys are computed from canonical state + config hash.
     """
-    
-    def __init__(self, config: CacheConfig):
+
+    def __init__(self, config: CacheConfig, seed: Optional[int] = None):
         """Initialize cache layer.
-        
+
         Args:
             config: Cache configuration
+            seed: Optional seed to make witness sampling reproducible
         """
         self.config = config
         self.cache: OrderedDict[str, Any] = OrderedDict()
         self.witnesses: Dict[str, WitnessSample] = {}
         self.stats = CacheStats()
-        self.rng = random.Random()
+        self.rng = random.Random(1337 if seed is None else seed)
     
     def get_or_compute(
         self,

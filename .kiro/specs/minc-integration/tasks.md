@@ -10,6 +10,11 @@ This implementation plan tracks the development of M|inc (Mercenaries Incorporat
 - **Completed**: All tasks ✓
 - **Status**: Production ready
 
+### Recent hygiene fixes
+
+- Removed accidentally committed CPython bytecode (`__pycache__/`, `*.pyc`) so future diffs remain source-only.
+- Documented that PR artifact checks (cache scrubbing, smoke runs) are executed manually rather than enforced in CI.
+
 ---
 
 - [x] 1. Set up M|inc project structure and core infrastructure
