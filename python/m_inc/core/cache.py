@@ -134,11 +134,14 @@ class CacheLayer:
     """
 
     def __init__(self, config: CacheConfig, seed: Optional[int] = None):
-        """Initialize cache layer.
-
-        Args:
-            config: Cache configuration
-            seed: Optional seed to make witness sampling reproducible
+        """
+        Initialize the cache layer with the provided configuration and an optional seed for reproducible witness sampling.
+        
+        Sets up the internal LRU cache storage, witness sample store, statistics tracker, and the pseudo-random generator used to decide witness sampling.
+        
+        Parameters:
+            config (CacheConfig): Configuration that controls cache behavior (e.g., max size, enabled flag, witness sampling rate).
+            seed (Optional[int]): Seed for the RNG used for witness sampling. When `None`, a fixed default seed is used to make sampling deterministic across runs.
         """
         self.config = config
         self.cache: OrderedDict[str, Any] = OrderedDict()
